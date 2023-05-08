@@ -13,12 +13,12 @@ import time
 # étape 1 : collecte des données
 def test_donnees():
     data = {
-        'pid': [random.randint(1, 10000) for _ in range(100000)],
-        'nom_processus': [f'processus_{random.randint(1, 1000)}' for _ in range(100000)],
-        'temps_creation': [random.uniform(0, 100) for _ in range(100000)],
-        'duration': [random.uniform(0, 100) for _ in range(100000)],
-        'frequency': [random.uniform(0, 100) for _ in range(100000)],
-        'label': [random.choice([0, 1]) for _ in range(100000)]
+        'pid': [random.randint(1, 10000) for _ in range(10000)],
+        'nom_processus': [f'processus_{random.randint(1, 1000)}' for _ in range(10000)],
+        'temps_creation': [random.uniform(0, 100) for _ in range(10000)],
+        'duration': [random.uniform(0, 100) for _ in range(10000)],
+        'frequency': [random.uniform(0, 100) for _ in range(10000)],
+        'label': [random.choice([0, 1]) for _ in range(10000)]
     }
 
     # Créer un DataFrame avec les données générées
@@ -139,12 +139,14 @@ print("-------------------------------------------")
 
 # test real data
 
+
+# Mettre le PID de ton preccesus qui tourne sur ton ordinateur ici
 desired_pid = 30863
 
 try:
     
     # Créer un objet Process avec le PID souhaité
-    pid = psutil.Process()
+    pid = psutil.Process(desired_pid)
 
     process_name = pid.name()
 
