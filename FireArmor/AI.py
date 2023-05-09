@@ -8,7 +8,18 @@ import random
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 import psutil
 import time
-
+import sys
+#draw the  process bar
+def drawProgressBar(percent, barLen = 20):
+    sys.stdout.write("\r")
+    progress = ""
+    for i in range(barLen):
+        if i < int(barLen * percent):
+            progress += "="
+        else:
+            progress += " "
+    sys.stdout.write("[ %s ] %.2f%%" % (progress, percent * 100))
+    sys.stdout.flush()
 
 # étape 1 : collecte des données
 def test_donnees():
@@ -117,6 +128,9 @@ for index, row in df.iterrows():
     predictions.append(prediction)
     current_state = prediction
 
+    percent = (index+0.0)/len(df)
+    drawProgressBar(percent)
+
 accuracy = accuracy_score(df['label'], predictions)
 precision = precision_score(df['label'], predictions)
 recall = recall_score(df['label'], predictions)
@@ -127,7 +141,7 @@ df['prediction'] = predictions
 df.to_csv('prediction.csv', index=False)
 
 
-
+print("\n-------------------------------------------")
 print("Accuracy:", accuracy)
 print("Precision:", precision)
 print("Recall:", recall)
@@ -186,3 +200,8 @@ except psutil.NoSuchProcess:
 
 # Étape 7: Surveillance et maintenance
 
+
+
+
+
+# https://towardsdatascience.com/workflow-of-a-machine-learning-project-ec1dba419b94
