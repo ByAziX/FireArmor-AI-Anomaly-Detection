@@ -200,13 +200,12 @@ except psutil.NoSuchProcess:
 
 
 
-
 try:
 
     # Obtenez la liste de tous les processus en cours d'exécution
     process_list = psutil.process_iter()
     index = 0
-    nombre_processus = 10000
+    nombre_processus = 100000
 
     # Parcourez chaque processus et affichez son nom et son ID
     for processus in process_list:
@@ -216,6 +215,8 @@ try:
         percent = (index+0.0)/nombre_processus
         drawProgressBar(percent)
 
+        process_name = processus.name()
+
         create_time = processus.create_time()
 
         create_time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(create_time))
@@ -224,10 +225,10 @@ try:
 
         processus.cpu_percent()
 
+        time.sleep(1)
 
         cpu_percent = processus.cpu_percent()
 
-        print(f"\nProcessus: {processus.name()} PID: {processus.pid} Temps de création: {create_time_str} Durée: {duration} CPU: {cpu_percent}\n")
 
         data = np.array([[duration, cpu_percent]])
 
@@ -240,6 +241,13 @@ try:
     
         prediction = global_model.predict(data)
 
+        print(f"\nProcess PID: {processus.pid}")
+        print(f"Process name: {process_name}")
+        print(f"Process creation time: {create_time_str}")
+        print(f"Process duration: {duration} seconds")
+        print(f"Process CPU usage: {cpu_percent}%")
+
+
         # add to the file etiquettes
         with open('etiquettes.csv', 'a') as f:
             f.write(str(prediction[0]) + '\n')
@@ -249,11 +257,6 @@ try:
         else:
             print("Le sys call est anormal.")
     
-    
-    
-
-    
-
 
 except psutil.NoSuchProcess:
     print(f"Process with PID {desired_pid} does not exist.")
