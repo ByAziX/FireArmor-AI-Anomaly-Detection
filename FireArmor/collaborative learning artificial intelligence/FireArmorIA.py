@@ -11,7 +11,6 @@ import time
 import sys
 
 # import python AI.py 
-import AI
 
 
 def train_user_model(X, y, base_model):
@@ -87,7 +86,6 @@ def load_data():
 # Créez des données fictif et des étiquettes
 #create_data()
 #pretraitement_donnees()
-#AI.run()
 
 
 
@@ -194,7 +192,7 @@ try:
     # Obtenez la liste de tous les processus en cours d'exécution
     process_list = psutil.process_iter()
     index = 0
-    nombre_processus = 100000
+    nombre_processus = 1000
 
     # Parcourez chaque processus et affichez son nom et son ID
     for processus in process_list:

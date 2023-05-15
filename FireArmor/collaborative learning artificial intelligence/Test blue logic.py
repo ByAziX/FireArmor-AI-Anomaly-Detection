@@ -18,7 +18,7 @@ def drawProgressBar(percent, barLen = 20):
             progress += "="
         else:
             progress += " "
-    sys.stdout.write("[ %s ] %.2f%%" % (progress, percent * 100))
+    sys.stdout.write("[ %s ] %.2f%%" % (progress, percent * 10000))
     sys.stdout.flush()
 
 # étape 1 : collecte des données
@@ -57,14 +57,16 @@ def pretraitement_donnees():
 # Étape 3: Construction du modèle de logique floue
 
 # Définir des variables linguistiques
-duration = ctrl.Antecedent(np.arange(0, 101, 1), 'duration')
+
+#duration = ctrl.Antecedent(np.arange(0, 101, 1), 'duration')
 frequency = ctrl.Antecedent(np.arange(0, 101, 1), 'frequency')
 anomaly = ctrl.Consequent(np.arange(0, 101, 1), 'anomaly')
 
 # Créer des ensembles flous
-duration['low'] = fuzz.trimf(duration.universe, [0, 0, 50])
+'''duration['low'] = fuzz.trimf(duration.universe, [0, 0, 50])
 duration['medium'] = fuzz.trimf(duration.universe, [0, 50, 100])
 duration['high'] = fuzz.trimf(duration.universe, [50, 100, 100])
+'''
 
 frequency['low'] = fuzz.trimf(frequency.universe, [0, 0, 50])
 frequency['medium'] = fuzz.trimf(frequency.universe, [0, 50, 100])
@@ -75,7 +77,7 @@ anomaly['medium'] = fuzz.trimf(anomaly.universe, [0, 50, 100])
 anomaly['high'] = fuzz.trimf(anomaly.universe, [50, 100, 100])
 
 # Établir des règles floues
-rule1 = ctrl.Rule(duration['low'] & frequency['low'], anomaly['low'])
+'''rule1 = ctrl.Rule(duration['low'] & frequency['low'], anomaly['low'])
 rule2 = ctrl.Rule(duration['medium'] & frequency['low'], anomaly['medium'])
 rule3 = ctrl.Rule(duration['high'] & frequency['low'], anomaly['high'])
 rule4 = ctrl.Rule(duration['low'] & frequency['medium'], anomaly['low'])
@@ -84,10 +86,18 @@ rule6 = ctrl.Rule(duration['high'] & frequency['medium'], anomaly['high'])
 rule7 = ctrl.Rule(duration['low'] & frequency['high'], anomaly['low'])
 rule8 = ctrl.Rule(duration['medium'] & frequency['high'], anomaly['medium'])
 rule9 = ctrl.Rule(duration['high'] & frequency['high'], anomaly['high'])
+'''
+rule1 = ctrl.Rule(frequency['low'], anomaly['low'])
+rule2 = ctrl.Rule(frequency['medium'], anomaly['medium'])
+rule3 = ctrl.Rule(frequency['high'], anomaly['high'])
+
+anomaly_ctrl = ctrl.ControlSystem([rule1, rule2, rule3])
+anomaly_detection = ctrl.ControlSystemSimulation(anomaly_ctrl)
 
 # Créer un système de contrôle flou
-anomaly_ctrl = ctrl.ControlSystem([rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9])
+'''anomaly_ctrl = ctrl.ControlSystem([rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9])
 anomaly_detection = ctrl.ControlSystemSimulation(anomaly_ctrl)
+'''
 
 # Étape 4: Implémentation de l'hystérésis
 def hysteresis(value, lower_threshold, upper_threshold, current_state):
@@ -120,7 +130,7 @@ df = pd.read_csv('donnees_system_calls.csv')
 # Entraîner et évaluer le modèle
 predictions = []
 for index, row in df.iterrows():
-    anomaly_detection.input['duration'] = row['duration']
+    # anomaly_detection.input['duration'] = row['duration']
     anomaly_detection.input['frequency'] = row['frequency']
     anomaly_detection.compute()
     prediction = 1 if hysteresis(anomaly_detection.output['anomaly'], lower_threshold, upper_threshold, current_state) else 0
@@ -138,7 +148,9 @@ for index, row in df.iterrows():
 df['label'] = predictions
 df.to_csv('label.csv', index=False)
 # enelver la duratio et la frequency
-df = df.drop(['duration', 'frequency'], axis=1)
+# df = df.drop(['duration', 'frequency'], axis=1)
+df = df.drop(['duration','frequency'], axis=1)
+
 df.to_csv('label.csv', index=False)
 
 
