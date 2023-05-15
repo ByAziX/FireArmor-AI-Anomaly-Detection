@@ -10,10 +10,6 @@ import psutil
 import time
 import sys
 
-# import python AI.py 
-import AI
-
-
 def train_user_model(X, y, base_model):
     clf = clone(base_model)
     clf.fit(X, y)
@@ -30,12 +26,12 @@ def drawProgressBar(percent, barLen = 20):
             progress += " "
     sys.stdout.write("[ %s ] %.2f%%" % (progress, percent * 100))
     sys.stdout.flush()
-    
 
 
-def create_data():
 
-    n_samples = 10000  # Remplacez par le nombre d'échantillons souhaité
+def create_Random_data():
+
+    n_samples = 100  # Remplacez par le nombre d'échantillons souhaité
     n_features = 2  # Remplacez par le nombre de caractéristiques souhaité
 
     data = {
@@ -46,11 +42,24 @@ def create_data():
         'frequency': [random.uniform(0, 100) for _ in range(n_samples)],
     }
 
+    etiquettes = np.random.randint(0, 2, n_samples)
+
+    with open("etiquettes.csv", "w", newline="") as csvfile:
+            csv_writer = csv.writer(csvfile, delimiter=',')
+            
+            # Ajouter l'en-tête au fichier CSV
+            csv_writer.writerow(["etiquette"])
+
+            # Ajouter les étiquettes au fichier CSV
+            csv_writer.writerows(etiquettes.reshape(-1, 1))
+
     # Créer un DataFrame avec les données générées
     df = pd.DataFrame(data)
 
     # Sauvegarder les données dans un fichier CSV
     df.to_csv('donnees_system_calls.csv', index=False)
+
+
 
 
 # etape 2 : pretraitement des données
@@ -85,9 +94,9 @@ def load_data():
     return X, y
 
 # Créez des données fictif et des étiquettes
-create_data()
+create_Random_data()
 pretraitement_donnees()
-AI.run()
+
 
 
 
@@ -194,7 +203,7 @@ try:
     # Obtenez la liste de tous les processus en cours d'exécution
     process_list = psutil.process_iter()
     index = 0
-    nombre_processus = 100000
+    nombre_processus = 100
 
     # Parcourez chaque processus et affichez son nom et son ID
     for processus in process_list:
@@ -262,4 +271,4 @@ except psutil.NoSuchProcess:
 
 
 
-# https://towardsdatascience.com/workflow-of-a-machine-learning-project-ec1dba419b94
+# https://towardsdatascience.com/workflow-of-a-machine-learning-project-ec1dba419b94 

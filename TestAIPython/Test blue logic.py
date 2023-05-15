@@ -36,13 +36,13 @@ def test_donnees():
     df = pd.DataFrame(data)
 
     # Sauvegarder les données dans un fichier CSV
-    df.to_csv('donnees_fictives.csv', index=False)
+    df.to_csv('donnees_system_calls.csv', index=False)
 
 
 # etape 2 : pretraitement des données
 def pretraitement_donnees():
     # Charger les données
-    df = pd.read_csv('donnees_fictives.csv')
+    df = pd.read_csv('donnees_system_calls.csv')
 
     # Supprimer les colonnes inutiles
     df = df.drop(['pid', 'nom_processus'], axis=1)
@@ -53,7 +53,7 @@ def pretraitement_donnees():
     # Normaliser les données
 
     # Sauvegarder les données dans un fichier CSV
-    df.to_csv('donnees_fictives.csv', index=False)
+    df.to_csv('donnees_system_calls.csv', index=False)
 
 # Étape 3: Construction du modèle de logique floue
 
@@ -116,7 +116,7 @@ test_donnees()
 pretraitement_donnees()
 
 # Charger les données
-df = pd.read_csv('donnees_fictives.csv')
+df = pd.read_csv('donnees_system_calls.csv')
 
 # Entraîner et évaluer le modèle
 predictions = []
@@ -137,8 +137,8 @@ recall = recall_score(df['label'], predictions)
 f1 = f1_score(df['label'], predictions)
 
 # write prediction to csv
-df['prediction'] = predictions
-df.to_csv('prediction.csv', index=False)
+df['etiquettes'] = predictions
+df.to_csv('etiquettes.csv', index=False)
 
 
 print("\n-------------------------------------------")
