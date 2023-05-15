@@ -23,12 +23,14 @@ def drawProgressBar(percent, barLen = 20):
 
 # étape 1 : collecte des données
 def test_donnees():
+    nb_processus = 10000
+    # Générer des données aléatoires
     data = {
-        'pid': [random.randint(1, 1000) for _ in range(1000)],
-        'nom_processus': [f'processus_{random.randint(1, 1000)}' for _ in range(1000)],
-        'temps_creation': [random.uniform(0, 100) for _ in range(1000)],
-        'duration': [random.uniform(0, 100) for _ in range(1000)],
-        'frequency': [random.uniform(0, 100) for _ in range(1000)],
+        'pid': [random.randint(1, 1000) for _ in range(nb_processus)],
+        'nom_processus': [f'processus_{random.randint(1, 1000)}' for _ in range(nb_processus)],
+        'temps_creation': [random.uniform(0, 100) for _ in range(nb_processus)],
+        'duration': [random.uniform(0, 100) for _ in range(nb_processus)],
+        'frequency': [random.uniform(0, 100) for _ in range(nb_processus)],
     }
 
     # Créer un DataFrame avec les données générées
@@ -136,7 +138,6 @@ for index, row in df.iterrows():
     prediction = 1 if hysteresis(anomaly_detection.output['anomaly'], lower_threshold, upper_threshold, current_state) else 0
     predictions.append(prediction)
     current_state = prediction
-
     percent = (index+0.0)/len(df)
     drawProgressBar(percent)
 
