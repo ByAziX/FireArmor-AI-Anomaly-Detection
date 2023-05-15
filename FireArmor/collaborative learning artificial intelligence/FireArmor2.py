@@ -42,16 +42,16 @@ def create_Random_data():
         'frequency': [random.uniform(0, 100) for _ in range(n_samples)],
     }
 
-    etiquettes = np.random.randint(0, 2, n_samples)
+    label = np.random.randint(0, 2, n_samples)
 
-    with open("etiquettes.csv", "w", newline="") as csvfile:
+    with open("label.csv", "w", newline="") as csvfile:
             csv_writer = csv.writer(csvfile, delimiter=',')
             
             # Ajouter l'en-tête au fichier CSV
             csv_writer.writerow(["etiquette"])
 
             # Ajouter les étiquettes au fichier CSV
-            csv_writer.writerows(etiquettes.reshape(-1, 1))
+            csv_writer.writerows(label.reshape(-1, 1))
 
     # Créer un DataFrame avec les données générées
     df = pd.DataFrame(data)
@@ -85,11 +85,11 @@ def pretraitement_donnees():
 def load_data():
     # Lire les données des fichiers CSV
     donnees_system_calls = pd.read_csv("donnees_system_calls.csv")
-    etiquettes = pd.read_csv("etiquettes.csv")
+    label = pd.read_csv("label.csv")
 
     # Convertir les DataFrames en tableaux numpy
     X = np.array(donnees_system_calls)
-    y = np.array(etiquettes).flatten()  # Utilisez `flatten()` pour convertir le tableau en 1D
+    y = np.array(label).flatten()  # Utilisez `flatten()` pour convertir le tableau en 1D
 
     return X, y
 
@@ -246,8 +246,8 @@ try:
         print(f"Process CPU usage: {cpu_percent}%")
 
 
-        # add to the file etiquettes
-        with open('etiquettes.csv', 'a') as f:
+        # add to the file label
+        with open('label.csv', 'a') as f:
             f.write(str(prediction[0]) + '\n')
 
         if prediction[0] == 0:

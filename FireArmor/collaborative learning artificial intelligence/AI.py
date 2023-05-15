@@ -93,17 +93,17 @@ def run():
         predictions.append(prediction)
         current_state = prediction
 
-        percent = (index+0.0)/len(df)
-        drawProgressBar(percent)
+    percent = (index+0.0)/len(df)
+    drawProgressBar(percent)
+    df['label'] = predictions
+    df.to_csv('label.csv', index=False)
+    # enelver la duratio et la frequency
+    df = df.drop(['duration', 'frequency'], axis=1)
+    df.to_csv('label.csv', index=False)
+    
 
-        with open("etiquettes.csv", "w", newline="") as csvfile:
-            csv_writer = csv.writer(csvfile, delimiter=',')
-            
-            # Ajouter l'en-tête au fichier CSV
-            csv_writer.writerow(["etiquette"])
 
-            # Ajouter les étiquettes au fichier CSV
-            csv_writer.writerows(zip(predictions))
+
 
 
 

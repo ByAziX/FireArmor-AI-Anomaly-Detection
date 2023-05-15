@@ -29,7 +29,6 @@ def test_donnees():
         'temps_creation': [random.uniform(0, 100) for _ in range(1000)],
         'duration': [random.uniform(0, 100) for _ in range(1000)],
         'frequency': [random.uniform(0, 100) for _ in range(1000)],
-        'label': [random.choice([0, 1]) for _ in range(1000)]
     }
 
     # Créer un DataFrame avec les données générées
@@ -131,10 +130,6 @@ for index, row in df.iterrows():
     percent = (index+0.0)/len(df)
     drawProgressBar(percent)
 
-accuracy = accuracy_score(df['label'], predictions)
-precision = precision_score(df['label'], predictions)
-recall = recall_score(df['label'], predictions)
-f1 = f1_score(df['label'], predictions)
 
 # write prediction to csv
 
@@ -148,64 +143,4 @@ df.to_csv('label.csv', index=False)
 
 
 
-print("\n-------------------------------------------")
-print("Accuracy:", accuracy)
-print("Precision:", precision)
-print("Recall:", recall)
-print("F1 Score:", f1)
-print("-------------------------------------------")
 
-# test real data
-
-
-# Mettre le PID de ton preccesus qui tourne sur ton ordinateur ici
-desired_pid = 30863
-
-try:
-    
-    # Créer un objet Process avec le PID souhaité
-    pid = psutil.Process(desired_pid)
-
-    process_name = pid.name()
-
-    create_time = pid.create_time()
-
-    create_time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(create_time))
-
-    duration = time.time() - create_time
-
-    pid.cpu_percent()
-
-    time.sleep(1)
-
-    cpu_percent = pid.cpu_percent()
-
-    anomaly_detection.input['duration'] = duration
-    anomaly_detection.input['frequency'] = cpu_percent
-    anomaly_detection.compute()
-    print("Valeur Pour l'hysteresis :",anomaly_detection.output['anomaly'])
-    prediction = 1 if hysteresis(anomaly_detection.output['anomaly'], lower_threshold, upper_threshold, current_state) else 0
-
-    print(f"Process name: {process_name}")
-    print(f"Process creation time: {create_time_str}")
-    print(f"Process duration: {duration} seconds")
-    print(f"Process CPU usage: {cpu_percent}%")
-    print(f"preidction: {prediction} ")
-
-
-except psutil.NoSuchProcess:
-    print(f"Process with PID {desired_pid} does not exist.")
-
-
-
-# Étape 6: Déploiement et mise à jour
-# (La mise en œuvre de cette étape dépend de l'environnement et des exigences spécifiques du projet)
-
-
-# Étape 7: Surveillance et maintenance
-
-
-
-
-
-# https://towardsdatascience.com/workflow-of-a-machine-learning-project-ec1dba419b94

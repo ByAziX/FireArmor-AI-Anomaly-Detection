@@ -35,7 +35,7 @@ def drawProgressBar(percent, barLen = 20):
 
 def create_data():
 
-    n_samples = 10000  # Remplacez par le nombre d'échantillons souhaité
+    n_samples = 100  # Remplacez par le nombre d'échantillons souhaité
     n_features = 2  # Remplacez par le nombre de caractéristiques souhaité
 
     data = {
@@ -76,18 +76,18 @@ def pretraitement_donnees():
 def load_data():
     # Lire les données des fichiers CSV
     donnees_system_calls = pd.read_csv("donnees_system_calls.csv")
-    etiquettes = pd.read_csv("etiquettes.csv")
+    label = pd.read_csv("label.csv")
 
     # Convertir les DataFrames en tableaux numpy
     X = np.array(donnees_system_calls)
-    y = np.array(etiquettes).flatten()  # Utilisez `flatten()` pour convertir le tableau en 1D
+    y = np.array(label).flatten()  # Utilisez `flatten()` pour convertir le tableau en 1D
 
     return X, y
 
 # Créez des données fictif et des étiquettes
-create_data()
-pretraitement_donnees()
-AI.run()
+#create_data()
+#pretraitement_donnees()
+#AI.run()
 
 
 
@@ -237,8 +237,8 @@ try:
         print(f"Process CPU usage: {cpu_percent}%")
 
 
-        # add to the file etiquettes
-        with open('etiquettes.csv', 'a') as f:
+        # add to the file label
+        with open('label.csv', 'a') as f:
             f.write(str(prediction[0]) + '\n')
 
         if prediction[0] == 0:
