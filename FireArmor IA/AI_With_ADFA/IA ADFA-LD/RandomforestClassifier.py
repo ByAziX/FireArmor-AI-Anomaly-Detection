@@ -18,12 +18,9 @@ PREDICTIONS = {
 
 class MyClassifier():
     def __init__(self, rs=42, logging=False):
-        self.binary_classifier = RandomForestClassifier(random_state=rs)
-        self.attack_classifier = RandomForestClassifier(random_state=rs)
-        self.voting_classifier = VotingClassifier(
-            estimators=[('binary', self.binary_classifier), ('attack', self.attack_classifier)],
-            voting='soft'
-        )
+        self.binary_classifier = RandomForestClassifier(n_estimators=100,random_state=rs)
+        self.attack_classifier = RandomForestClassifier(n_estimators=100,random_state=rs)
+        
         self.attack_vector = None
         self.rs = rs
         self.metrics = {}
