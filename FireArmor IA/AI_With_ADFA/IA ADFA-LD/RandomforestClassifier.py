@@ -1,10 +1,9 @@
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, confusion_matrix, roc_curve
-from sklearn.metrics import ConfusionMatrixDisplay
-from sklearn.ensemble import RandomForestClassifier, VotingClassifier
-from matplotlib import pyplot as plt
+from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.ensemble import RandomForestClassifier
 import pandas as pd
 import numpy as np
+
 
 PREDICTIONS = {
     0: "NO ATTACK",
@@ -17,22 +16,25 @@ PREDICTIONS = {
 }
 
 class MyClassifier():
-    def __init__(self, rs=42, logging=False):
+    def __init__(self, train_data_path, validation_data_path, rs=42, logging=False):
         self.binary_classifier = RandomForestClassifier(n_estimators=100,random_state=rs)
         self.attack_classifier = RandomForestClassifier(n_estimators=100,random_state=rs)
         
+        self.train_data_path = train_data_path
+        self.validation_data_path = validation_data_path
         self.attack_vector = None
         self.rs = rs
         self.metrics = {}
         self.logging = logging
         
-    def load_data(self, callback=None):
-        self.train_data = pd.read_csv("/home/hugo/ISEN/Cours/FireArmor/FireArmor-AI-Anomaly-Detection/FireArmor IA/AI_With_ADFA/IA ADFA-LD/train_data.csv")
-        self.validation_data = pd.read_csv("/home/hugo/ISEN/Cours/FireArmor/FireArmor-AI-Anomaly-Detection/FireArmor IA/AI_With_ADFA/IA ADFA-LD/validation_data.csv")
-        self.attack_data = self.train_data[self.train_data.iloc[:, 2:].sum(axis=1) == 1]
-
-        if callback:
-            callback()
+    def load_data(self):
+        try:
+            self.train_data = pd.read_csv(self.train_data_path)
+            self.validation_data = pd.read_csv(self.validation_data_path)
+            self.attack_data = self.train_data[self.train_data.iloc[:, 2:].sum(axis=1) == 1]
+        except Exception as e:
+            print(f"Erreur lors du chargement des données : {e}")
+            return None
 
     def get_X_y(self, df):
         trace = df["trace"].apply(lambda x: list(map(int, x.split())))
@@ -97,27 +99,13 @@ class MyClassifier():
 
     def attack_train(self):
         if self.logging:
-            print("\nAttack training in progress")
+            print("\nEntraînement de la détection d'attaque en cours")
         traces = self.attack_data["trace"].apply(lambda x: x.split())
         self.attack_vector = self.prepare_vector(traces)
 
         X, y = self.get_attack_X_y(self.attack_data)
-        X_train, X_test, y_train, y_test = [], [], [], []
-        for i in range(6):
-            ind = (y.argmax(axis=1) == i)
-            arr_x = X[ind]
-            arr_y = y[ind]
-            np.random.shuffle(arr_x)
-            X_train += list(arr_x[::2])
-            y_train += list(arr_y[::2])
-            X_test += list(arr_x[1::2])
-            y_test += list(arr_y[1::2])
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=self.rs, stratify=y.argmax(axis=1))
 
-        X_train = np.array(X_train)
-        X_test = np.array(X_test)
-        y_train = np.array(y_train)
-        y_test = np.array(y_test)
-        
         self.metrics["y_test"] = y_test.T
         y_train = y_train.argmax(axis=1)
         y_test = y_test.argmax(axis=1)
@@ -130,7 +118,7 @@ class MyClassifier():
         
         y_pred = self.attack_classifier.predict(X_test)
         if self.logging:
-            print("\nAttack_classifier accuracy:", accuracy_score(y_test, y_pred))
+            print("\nPrécision de la détection d'attaque :", accuracy_score(y_test, y_pred))
 
         self.metrics["multilabel_accuracy"] = accuracy_score(y_test, y_pred)
 
@@ -138,7 +126,7 @@ class MyClassifier():
         
     def binary_train(self):
         if self.logging:
-            print("Binary training in progress")
+            print("Entraînement du classifieur binaire en cours")
             
         X, y = self.get_X_y(self.train_data)
         y = y.sum(axis=1)
@@ -157,12 +145,13 @@ class MyClassifier():
         y_pred = y_pred
         
         if self.logging:
-            print("Binary overall test accuracy:", accuracy_score(y_test, y_pred))
-            print("Binary: attack only:", accuracy_score([1 for i in range(len(pred_a))], pred_a))
-            print("Binary: validation only:", accuracy_score([0 for i in range(len(pred_val))], pred_val))
+            print("Précision globale du classifieur binaire sur les données de test :", accuracy_score(y_test, y_pred))
+            print("Précision du classifieur binaire sur les attaques uniquement :", accuracy_score([1 for _ in range(len(pred_a))], pred_a))
+            print("Précision du classifieur binaire sur la validation uniquement :", accuracy_score([0 for _ in range(len(pred_val))], pred_val))
 
         self.metrics["confusion_matrix"] = confusion_matrix(y_test, y_pred).ravel()
         self.metrics["binary_accuracy"] = accuracy_score(y_test, y_pred)
+
 
 
     def predict(self, X, predict_one=False):
@@ -195,30 +184,40 @@ class MyClassifier():
 if __name__ == "__main__":
     import sys
     
-    filename = "/home/hugo/ISEN/Cours/FireArmor/FireArmor-AI-Anomaly-Detection/FireArmor IA/AI_With_ADFA/ADFA-LD/Attack_Data_Master/Meterpreter_9/UAD-Meterpreter-9-2462.txt"
+    train_data_path = "FireArmor IA/AI_With_ADFA/IA ADFA-LD/train_data.csv"
+    validation_data_path = "FireArmor IA/AI_With_ADFA/IA ADFA-LD/validation_data.csv"
 
-    mc = MyClassifier()
+    mc = MyClassifier(train_data_path, validation_data_path)
     mc.load_data()
     print("Training model")
     mc.adfa_train()
     print("Training complete")
 
     try:
-        print(f"Loading {filename}...")
-        with open(filename) as fs:
-            trace = fs.read().strip()
+            files = [
+        "FireArmor IA/AI_With_ADFA/ADFA-LD/Attack_Data_Master/Meterpreter_4/UAD-Meterpreter-4-1613.txt",
+        "FireArmor IA/AI_With_ADFA/IA ADFA-LD/tests/UVD-0008.txt",
+        "FireArmor IA/AI_With_ADFA/ADFA-LD/Attack_Data_Master/Web_Shell_9/UAD-WS9-1371.txt",
+        "FireArmor IA/AI_With_ADFA/ADFA-LD/Attack_Data_Master/Hydra_SSH_2/UAD-Hydra-SSH-2-1371.txt",
+        "FireArmor IA/AI_With_ADFA/ADFA-LD/Attack_Data_Master/Hydra_FTP_9/UAD-Hydra-FTP-9-961.txt",
+        "FireArmor IA/AI_With_ADFA/IA ADFA-LD/tests/UAD-Adduser-5-1371.txt",
+        "FireArmor IA/AI_With_ADFA/ADFA-LD/Attack_Data_Master/Java_Meterpreter_6/UAD-Java-Meterpreter-6-961.txt"
+        ]  
+        
+            print(f"Loading ...")
 
-        pred = PREDICTIONS.get(mc.predict(trace, predict_one=True), "-")
-        print("VERDICT:", pred)
+            for filename in files:
+                with open(filename) as fs:
+                    trace = fs.read().strip()
 
-        filename = "/home/hugo/ISEN/Cours/FireArmor/FireArmor-AI-Anomaly-Detection/FireArmor IA/AI_With_ADFA/IA ADFA-LD/tests/UVD-0008.txt"
+                pred = PREDICTIONS.get(mc.predict(trace, predict_one=True), "-")
+                print("VERDICT:", pred)
 
-        print(f"Loading {filename}...")
-        with open(filename) as fs:
-            trace = fs.read().strip()
 
-        pred = PREDICTIONS.get(mc.predict(trace, predict_one=True), "-")
-        print("VERDICT:", pred)
+
+
+
+
 
     except Exception as e:
         print(e)
