@@ -16,7 +16,7 @@ PREDICTIONS = {
 }
 
 class MyClassifier():
-    def __init__(self, train_data_path, validation_data_path, rs=42, logging=False):
+    def __init__(self, train_data_path, validation_data_path, rs=42, logging=True):
         self.binary_classifier = RandomForestClassifier(n_estimators=100,random_state=rs)
         self.attack_classifier = RandomForestClassifier(n_estimators=100,random_state=rs)
         
