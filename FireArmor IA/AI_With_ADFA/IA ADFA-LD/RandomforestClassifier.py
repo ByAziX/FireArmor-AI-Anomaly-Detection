@@ -182,7 +182,6 @@ class MyClassifier():
 
      # Le reste du code reste inchangé...
 if __name__ == "__main__":
-    import sys
     
     train_data_path = "FireArmor IA/AI_With_ADFA/IA ADFA-LD/train_data.csv"
     validation_data_path = "FireArmor IA/AI_With_ADFA/IA ADFA-LD/validation_data.csv"
