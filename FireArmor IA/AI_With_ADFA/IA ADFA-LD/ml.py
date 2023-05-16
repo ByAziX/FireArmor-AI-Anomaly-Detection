@@ -29,8 +29,8 @@ class MyClassifier():
         self.logging = logging
         
     def load_data(self, callback=None):
-        self.train_data = pd.read_csv("/home/hugo/ISEN/Cours/FireArmor/FireArmor-AI-Anomaly-Detection/FireArmor IA/AI_With_ADFA/Test2/train_data.csv")
-        self.validation_data = pd.read_csv("/home/hugo/ISEN/Cours/FireArmor/FireArmor-AI-Anomaly-Detection/FireArmor IA/AI_With_ADFA/Test2/validation_data.csv")
+        self.train_data = pd.read_csv("/home/hugo/ISEN/Cours/FireArmor/FireArmor-AI-Anomaly-Detection/FireArmor IA/AI_With_ADFA/IA ADFA-LD/train_data.csv")
+        self.validation_data = pd.read_csv("/home/hugo/ISEN/Cours/FireArmor/FireArmor-AI-Anomaly-Detection/FireArmor IA/AI_With_ADFA/IA ADFA-LD/validation_data.csv")
         self.attack_data = self.train_data[self.train_data.iloc[:, 2:].sum(axis=1) == 1]
 
         if callback:
@@ -136,19 +136,7 @@ class MyClassifier():
 
         self.metrics["multilabel_accuracy"] = accuracy_score(y_test, y_pred)
 
-    def draw_map(self):
-        disp = plot_confusion_matrix(self.attack_classifier, self.metrics["map_x"],
-                                     self.metrics["map_y"], cmap=plt.cm.Blues, normalize=None)
-        plt.show()
-        
-    def draw_roc_curves(self):
-        for i in range(6):
-            lr_fpr, lr_tpr, _ = roc_curve(self.metrics["y_test"][i], self.metrics["probas"][i])
-            plt.plot(lr_fpr, lr_tpr, marker='.', label=PREDICTIONS[i+1])
-        plt.xlabel('FPR')
-        plt.ylabel('TPR')
-        plt.legend()
-        plt.show()
+
         
     def binary_train(self):
         if self.logging:
@@ -212,13 +200,6 @@ if __name__ == "__main__":
 
     filename = "/home/hugo/ISEN/Cours/FireArmor/FireArmor-AI-Anomaly-Detection/FireArmor IA/AI_With_ADFA/ADFA-LD/Attack_Data_Master/Meterpreter_9/UAD-Meterpreter-9-2462.txt"
 
-    '''with open(filename) as f:
-        trace = f.read()
-
-        convert = list(map(int, trace.split()))
-    '''
-
-
     mc = MyClassifier()
     mc.load_data()
     print("Training model")
@@ -232,6 +213,17 @@ if __name__ == "__main__":
 
         pred = PREDICTIONS.get(mc.predict(trace, predict_one=True), "-")
         print("VERDICT:", pred)
+
+
+        filename = "/home/hugo/ISEN/Cours/FireArmor/FireArmor-AI-Anomaly-Detection/FireArmor IA/AI_With_ADFA/IA ADFA-LD/tests/UVD-0008.txt"
+
+        print(f"Loading {filename}...")
+        with open(filename) as fs:
+            trace = fs.read().strip()
+
+        pred = PREDICTIONS.get(mc.predict(trace, predict_one=True), "-")
+        print("VERDICT:", pred)
+
     except Exception as e:
         print(e)
         print()
