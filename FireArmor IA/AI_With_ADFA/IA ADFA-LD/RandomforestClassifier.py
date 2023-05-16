@@ -1,7 +1,7 @@
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix, roc_curve
 from sklearn.metrics import ConfusionMatrixDisplay
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, VotingClassifier
 from matplotlib import pyplot as plt
 import pandas as pd
 import numpy as np
@@ -20,12 +20,14 @@ class MyClassifier():
     def __init__(self, rs=42, logging=False):
         self.binary_classifier = RandomForestClassifier(random_state=rs)
         self.attack_classifier = RandomForestClassifier(random_state=rs)
+        self.voting_classifier = VotingClassifier(
+            estimators=[('binary', self.binary_classifier), ('attack', self.attack_classifier)],
+            voting='soft'
+        )
         self.attack_vector = None
         self.rs = rs
         self.metrics = {}
         self.logging = logging
-        
-
         
     def load_data(self, callback=None):
         self.train_data = pd.read_csv("/home/hugo/ISEN/Cours/FireArmor/FireArmor-AI-Anomaly-Detection/FireArmor IA/AI_With_ADFA/IA ADFA-LD/train_data.csv")
@@ -193,7 +195,6 @@ class MyClassifier():
 
 
      # Le reste du code reste inchangé...
-
 if __name__ == "__main__":
     import sys
     
