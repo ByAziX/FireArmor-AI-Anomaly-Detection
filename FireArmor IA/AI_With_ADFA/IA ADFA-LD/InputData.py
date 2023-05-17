@@ -85,32 +85,36 @@ def create_file(file, dataTrain, dataAttack, sub_dir_attack ):
         f.write(",%s\n" % ','.join(map(str, label)))
         for dataset in [dataTrain, dataAttack]:
             count+=1
-            for item in dataset:
-                                # add index increment by 1 and write the sequence with virgule separator 
+            for fichier in dataset:
+                fileContent = readCharsFromFile(fichier)
+                                    # add index increment by 1 and write the sequence with virgule separator 
                 index.append(index[-1]+1 if index else 0)
                 f.write("%s," % index[-1])
-                f.write("%s" % ' '.join(map(str, item)))
+                f.write("%s" % ' '.join(map(str, fileContent)))
                 if count == 1: 
                     results = [0] * len(label[1:])
                     f.write(",%s\n" % ','.join(map(str, results)))
+                        
+                    # get name of the file sub_dir_attack and if the label = sub_dir_attack then 1 else 0
                     
-                # get name of the file sub_dir_attack and if the label = sub_dir_attack then 1 else 0
-                
                 subdomain = ''
                 results = [0] * len(label[1:])
                 if count == 2:
-                    for i in range(0,len(sub_dir_attack)):
-                        # get the subdomain name
-                        subdomain = sub_dir_attack[i].split('/')[-2]
-                        subdomain = subdomain.split('_')[:-1]
-                        subdomain = '_'.join(subdomain)
+                    # get the subdomain name
+                    subdomain = fichier.split('/')[-2]
+                    subdomain = subdomain.split('_')[:-1]
+                    subdomain = '_'.join(subdomain)
+                    print(subdomain)
                     # check if the subdomain is in the label
                     if subdomain in label[1:]:
                         # get the index of the subdomain in the label
                         index_subdomain = label.index(subdomain)
+                        #print(subdomain,index_subdomain)
                         # set the value to 1
-                        results[index_subdomain] = 1
-                        f.write(",%s\n" % ','.join(map(str, results)))
+                        print(index_subdomain)
+                        if index_subdomain:
+                            results[index_subdomain-1] = 1
+                            f.write(",%s\n" % ','.join(map(str, results)))
 
 
 
@@ -121,15 +125,14 @@ if __name__ == "__main__":
     directory_validation = "FireArmor IA/AI_With_ADFA/ADFA-LD/Validation_Data_Master/"
     directory_attack = "FireArmor IA/AI_With_ADFA/ADFA-LD/Attack_Data_Master/"
 
-    files = readfilesfromAdir(directory_train)
+    train_files = readfilesfromAdir(directory_train)
     sub_dir_attack = get_attack_subdir(directory_attack)
-    train = get_all_call_sequences(files)
+    # train = get_all_call_sequences(files)
     print("train.csv is created")
 
     # récupère les fichiers de chaque sous-dossier
-    attack = []
+    attack_files = []
     for sub_dir in sub_dir_attack:
-        attack_files = readfilesfromAdir(sub_dir)
-        attack.extend(get_all_call_sequences(attack_files))
+        attack_files.extend(readfilesfromAdir(sub_dir))
 
-    create_file("train.csv", train, attack, sub_dir_attack)
+    create_file("train.csv", train_files, attack_files, sub_dir_attack)
