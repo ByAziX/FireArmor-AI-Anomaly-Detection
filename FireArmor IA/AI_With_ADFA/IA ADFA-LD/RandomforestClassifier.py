@@ -165,7 +165,7 @@ class MyClassifier():
             if self.logging:
                 print("No attack")
             return 0
-
+        print("Attack")
         X_atk = self.transform_attack(X)
         attack_predict = self.attack_predict(X_atk) + 1
 
@@ -183,7 +183,7 @@ class MyClassifier():
      # Le reste du code reste inchangé...
 if __name__ == "__main__":
     
-    train_data_path = "FireArmor IA/AI_With_ADFA/IA ADFA-LD/train_data.csv"
+    train_data_path = "/home/hugo/ISEN/Cours/FireArmor/FireArmor-AI-Anomaly-Detection/train.csv"
     validation_data_path = "FireArmor IA/AI_With_ADFA/IA ADFA-LD/validation_data.csv"
 
     mc = MyClassifier(train_data_path, validation_data_path)
@@ -211,12 +211,6 @@ if __name__ == "__main__":
 
                 pred = PREDICTIONS.get(mc.predict(trace, predict_one=True), "-")
                 print("VERDICT:", pred)
-
-
-
-
-
-
 
     except Exception as e:
         print(e)

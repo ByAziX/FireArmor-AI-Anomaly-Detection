@@ -17,3 +17,7 @@ https://github.com/verazuo/a-labelled-version-of-the-ADFA-LD-dataset
 
 
 https://github.com/darkenezy/ADFA-LD-Classifier/blob/master/venv/Scripts/ml.py
+
+
+
+https://search.brave.com/search?q=Unix+auditd+trace+syscall&source=web
