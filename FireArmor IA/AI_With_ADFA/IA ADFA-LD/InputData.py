@@ -85,32 +85,38 @@ def create_file(file, dataTrain, dataAttack,filesTrain, sub_dir_attack ):
         for dataset in [dataTrain, dataAttack]:
             count+=1
 
-            for item in dataset: 
+            for item in dataset:
+                
                 results = []  # Create an empty list to store the results
                 # add index increment by 1 and write the sequence with virgule separator 
                 index.append(index[-1]+1 if index else 0)
                 f.write("%s," % index[-1])
                 f.write("%s" % ' '.join(map(str, item)))
-                results = [0] * len(label[1:])
-                f.write(",%s\n" % ','.join(map(str, results)))
+                if count == 1: 
+                    results = [0] * len(label[1:])
+                    f.write(",%s\n" % ','.join(map(str, results)))
                     
                 # get name of the file sub_dir_attack and if the label = sub_dir_attack then 1 else 0
 
 
                 subdomain = ''
-                results = []
+                results = [0,0,0,0,0,0]
                 if count == 2:
                     for i in range(0,len(sub_dir_attack)):
                         # get the subdomain name
                         subdomain = sub_dir_attack[i].split('/')[-2]
-                        subdomain = subdomain.split('_')[0]
-                    if subdomain in label[1:]:
-                            results.append(1)
-                    else:
-                            results.append(0)
+                        subdomain = subdomain.split('_')[:-1]
+                        subdomain = '_'.join(subdomain)
 
-                    # write the label with virgule separator
-                    f.write(",%s\n" % ','.join(map(str, results)))
+                        print(subdomain)
+                    # check if the subdomain is in the label
+                    if subdomain in label[1:]:
+                        # get the index of the subdomain in the label
+                        index_subdomain = label.index(subdomain)
+                        # set the value to 1
+                        results[index_subdomain] = 1
+                        f.write(",%s\n" % ','.join(map(str, results)))
+                                   
 
                 
 
@@ -125,8 +131,9 @@ if __name__ == "__main__":
     
 
     files = readfilesfromAdir(directory_train)
-    train = get_all_call_sequences(files)
     sub_dir_attack = get_attack_subdir(directory_attack)
+
+    train = get_all_call_sequences(files)
     attack = get_all_call_sequences(sub_dir_attack)
     create_file("train.csv", train, attack, files, sub_dir_attack)
     
