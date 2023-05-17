@@ -37,9 +37,9 @@ def get_all_call_sequences(files, loggin=False):
     for eachfile in files:
         if not eachfile.endswith("DS_Store"):
             allthelist.append(readCharsFromFile(eachfile))
-            print ("The file "+ str(eachfile) + " is read")
+            
             if loggin:
-                
+                print ("The file "+ str(eachfile) + " is read")
                 print(allthelist[-1])
         else:
             print ("Skip the file "+ str(eachfile))
@@ -76,7 +76,7 @@ def get_all_call_sequences(files, loggin=False):
     return (allthelist)
 
 
-def create_file(file, dataTrain, dataAttack,filesTrain, sub_dir_attack ):
+def create_file(file, dataTrain, dataAttack, sub_dir_attack ):
     with open(file, 'w') as f:
         label = ['trace', 'Adduser', 'Hydra_FTP', 'Hydra_SSH', 'Java_Meterpreter', 'Meterpreter', 'Web_Shell']
         index = []
@@ -85,11 +85,8 @@ def create_file(file, dataTrain, dataAttack,filesTrain, sub_dir_attack ):
         f.write(",%s\n" % ','.join(map(str, label)))
         for dataset in [dataTrain, dataAttack]:
             count+=1
-
             for item in dataset:
-                
-                results = []  # Create an empty list to store the results
-                # add index increment by 1 and write the sequence with virgule separator 
+                                # add index increment by 1 and write the sequence with virgule separator 
                 index.append(index[-1]+1 if index else 0)
                 f.write("%s," % index[-1])
                 f.write("%s" % ' '.join(map(str, item)))
@@ -97,28 +94,23 @@ def create_file(file, dataTrain, dataAttack,filesTrain, sub_dir_attack ):
                     results = [0] * len(label[1:])
                     f.write(",%s\n" % ','.join(map(str, results)))
                     
-                # get name of the file sub_dir_attack and if the label = sub_dir_attack then 1 else 0
-
-
+                # get name of the file sub_dir_attack and if the label = sub_dir_attack then 1 else 0
+                
                 subdomain = ''
-                results = [0,0,0,0,0,0]
+                results = [0] * len(label[1:])
                 if count == 2:
                     for i in range(0,len(sub_dir_attack)):
                         # get the subdomain name
                         subdomain = sub_dir_attack[i].split('/')[-2]
                         subdomain = subdomain.split('_')[:-1]
                         subdomain = '_'.join(subdomain)
-
-                    # check if the subdomain is in the label
+                    # check if the subdomain is in the label
                     if subdomain in label[1:]:
-                        # get the index of the subdomain in the label
+                        # get the index of the subdomain in the label
                         index_subdomain = label.index(subdomain)
-                        # set the value to 1
+                        # set the value to 1
                         results[index_subdomain] = 1
                         f.write(",%s\n" % ','.join(map(str, results)))
-                                   
-
-                
 
 
 
@@ -127,14 +119,17 @@ def create_file(file, dataTrain, dataAttack,filesTrain, sub_dir_attack ):
 if __name__ == "__main__":
     directory_train = "FireArmor IA/AI_With_ADFA/ADFA-LD/Training_Data_Master/"
     directory_validation = "FireArmor IA/AI_With_ADFA/ADFA-LD/Validation_Data_Master/"
-    directory_attack ="FireArmor IA/AI_With_ADFA/ADFA-LD/Attack_Data_Master/"
-    
+    directory_attack = "FireArmor IA/AI_With_ADFA/ADFA-LD/Attack_Data_Master/"
 
     files = readfilesfromAdir(directory_train)
     sub_dir_attack = get_attack_subdir(directory_attack)
     train = get_all_call_sequences(files)
-    for i in range(0,len(sub_dir_attack)):
-        attack_files = readfilesfromAdir(sub_dir_attack[i])
-        attack = get_all_call_sequences(attack_files)
-    
-    # create_file("train.csv", train, attack, files, sub_dir_attack)
+    print("train.csv is created")
+
+    # récupère les fichiers de chaque sous-dossier
+    attack = []
+    for sub_dir in sub_dir_attack:
+        attack_files = readfilesfromAdir(sub_dir)
+        attack.extend(get_all_call_sequences(attack_files))
+
+    create_file("train.csv", train, attack, sub_dir_attack)
