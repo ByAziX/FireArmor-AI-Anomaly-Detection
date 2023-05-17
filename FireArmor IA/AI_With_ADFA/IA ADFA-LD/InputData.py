@@ -29,7 +29,7 @@ def get_attack_subdir(path):
     return (subdirectories)
 
 
-def get_all_call_sequences(directory, loggin=False):
+def get_all_call_sequences(files, loggin=False):
     
     allthelist = []
 
@@ -37,8 +37,9 @@ def get_all_call_sequences(directory, loggin=False):
     for eachfile in files:
         if not eachfile.endswith("DS_Store"):
             allthelist.append(readCharsFromFile(eachfile))
+            print ("The file "+ str(eachfile) + " is read")
             if loggin:
-                print ("The file "+ str(eachfile) + " is read")
+                
                 print(allthelist[-1])
         else:
             print ("Skip the file "+ str(eachfile))
@@ -108,7 +109,6 @@ def create_file(file, dataTrain, dataAttack,filesTrain, sub_dir_attack ):
                         subdomain = subdomain.split('_')[:-1]
                         subdomain = '_'.join(subdomain)
 
-                        print(subdomain)
                     # check if the subdomain is in the label
                     if subdomain in label[1:]:
                         # get the index of the subdomain in the label
@@ -132,10 +132,9 @@ if __name__ == "__main__":
 
     files = readfilesfromAdir(directory_train)
     sub_dir_attack = get_attack_subdir(directory_attack)
-
     train = get_all_call_sequences(files)
-    attack = get_all_call_sequences(sub_dir_attack)
-    create_file("train.csv", train, attack, files, sub_dir_attack)
+    for i in range(0,len(sub_dir_attack)):
+        attack_files = readfilesfromAdir(sub_dir_attack[i])
+        attack = get_all_call_sequences(attack_files)
     
-    
-
+    # create_file("train.csv", train, attack, files, sub_dir_attack)
