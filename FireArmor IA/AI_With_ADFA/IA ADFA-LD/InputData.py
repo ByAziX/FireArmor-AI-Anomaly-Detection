@@ -37,7 +37,7 @@ def get_all_call_sequences(files, loggin=False):
     for eachfile in files:
         if not eachfile.endswith("DS_Store"):
             allthelist.append(readCharsFromFile(eachfile))
-            print ("The file "+ str(eachfile) + " is read")
+            #print ("The file "+ str(eachfile) + " is read")
             if loggin:
                 
                 print(allthelist[-1])
@@ -99,7 +99,7 @@ def create_file(file, dataTrain, dataAttack,filesTrain, sub_dir_attack ):
                     
                 # get name of the file sub_dir_attack and if the label = sub_dir_attack then 1 else 0
 
-
+                
                 subdomain = ''
                 results = [0,0,0,0,0,0]
                 if count == 2:
@@ -133,8 +133,9 @@ if __name__ == "__main__":
     files = readfilesfromAdir(directory_train)
     sub_dir_attack = get_attack_subdir(directory_attack)
     train = get_all_call_sequences(files)
-    for i in range(0,len(sub_dir_attack)):
-        attack_files = readfilesfromAdir(sub_dir_attack[i])
-        attack = get_all_call_sequences(attack_files)
+    attack=[]
+    for sub in sub_dir_attack:
+        attack_files = readfilesfromAdir(sub)
+        attack.extend(get_all_call_sequences(attack_files))
     
-    # create_file("train.csv", train, attack, files, sub_dir_attack)
+    create_file("train.csv", train, attack, files, sub_dir_attack)
