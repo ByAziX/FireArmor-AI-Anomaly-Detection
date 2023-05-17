@@ -79,28 +79,38 @@ def create_file(file, dataTrain, dataAttack,filesTrain, sub_dir_attack ):
     with open(file, 'w') as f:
         label = ['trace', 'Adduser', 'Hydra_FTP', 'Hydra_SSH', 'Java_Meterpreter', 'Meterpreter', 'Web_Shell']
         index = []
+        count=0
         # write the label with virgule separator 
         f.write(",%s\n" % ','.join(map(str, label)))
         for dataset in [dataTrain, dataAttack]:
+            count+=1
+
             for item in dataset: 
                 results = []  # Create an empty list to store the results
                 # add index increment by 1 and write the sequence with virgule separator 
                 index.append(index[-1]+1 if index else 0)
                 f.write("%s," % index[-1])
                 f.write("%s" % ' '.join(map(str, item)))
+                results = [0] * len(label[1:])
+                f.write(",%s\n" % ','.join(map(str, results)))
                     
                 # get name of the file sub_dir_attack and if the label = sub_dir_attack then 1 else 0
-                for i in range(0,len(sub_dir_attack)):
-                    # get the subdomain name
-                    subdomain = sub_dir_attack[i].split('/')[-2]
-                    subdomain = subdomain.split('_')[0]
+
+
+                subdomain = ''
+                results = []
+                if count == 2:
+                    for i in range(0,len(sub_dir_attack)):
+                        # get the subdomain name
+                        subdomain = sub_dir_attack[i].split('/')[-2]
+                        subdomain = subdomain.split('_')[0]
                     if subdomain in label[1:]:
                             results.append(1)
                     else:
                             results.append(0)
 
-                # write the label with virgule separator
-                f.write(",%s\n" % ','.join(map(str, results)))
+                    # write the label with virgule separator
+                    f.write(",%s\n" % ','.join(map(str, results)))
 
                 
 
