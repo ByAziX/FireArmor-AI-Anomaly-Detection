@@ -29,53 +29,6 @@ def get_attack_subdir(path):
     return (subdirectories)
 
 
-def get_all_call_sequences(files, loggin=False):
-    
-    allthelist = []
-
-    files.sort()
-    for eachfile in files:
-        if not eachfile.endswith("DS_Store"):
-            allthelist.append(readCharsFromFile(eachfile))
-            
-            if loggin:
-                print ("The file "+ str(eachfile) + " is read")
-                print(allthelist[-1])
-        else:
-            print ("Skip the file "+ str(eachfile))
-
-    
-    if loggin:
-        elements = []
-        for item in allthelist:
-            for key in item:
-                if key not in elements:
-                    elements.append(key)
-        elements = map(int,elements)
-        elements = sorted(elements)
-        print ("The total unique elements:")
-        print (elements)
-
-        print ("The maximum number of elements:")
-        print (max(elements))
-
-        #print ("The length elements:")
-        #print (len(elements))
-        print (len(allthelist))
-
-        #clean the all list data set
-        _max = 0
-        for i in range(0,len(allthelist)):
-            _max = max(_max,len(allthelist[i]))
-            allthelist[i] = map(int,allthelist[i])
-            print(allthelist[i])
-
-
-        print ("The maximum length of a sequence is that {}".format(_max))
-
-    return (allthelist)
-
-
 def create_file(file, dataTrain, dataAttack, sub_dir_attack ):
     with open(file, 'w') as f:
         label = ['trace', 'Adduser', 'Hydra_FTP', 'Hydra_SSH', 'Java_Meterpreter', 'Meterpreter', 'Web_Shell']
@@ -104,14 +57,12 @@ def create_file(file, dataTrain, dataAttack, sub_dir_attack ):
                     subdomain = fichier.split('/')[-2]
                     subdomain = subdomain.split('_')[:-1]
                     subdomain = '_'.join(subdomain)
-                    print(subdomain)
                     # check if the subdomain is in the label
                     if subdomain in label[1:]:
                         # get the index of the subdomain in the label
                         index_subdomain = label.index(subdomain)
                         #print(subdomain,index_subdomain)
                         # set the value to 1
-                        print(index_subdomain)
                         if index_subdomain:
                             results[index_subdomain-1] = 1
                             f.write(",%s\n" % ','.join(map(str, results)))
@@ -121,13 +72,12 @@ def create_file(file, dataTrain, dataAttack, sub_dir_attack ):
 
 
 if __name__ == "__main__":
-    directory_train = "FireArmor IA/AI_With_ADFA/ADFA-LD/Training_Data_Master/"
-    directory_validation = "FireArmor IA/AI_With_ADFA/ADFA-LD/Validation_Data_Master/"
-    directory_attack = "FireArmor IA/AI_With_ADFA/ADFA-LD/Attack_Data_Master/"
+    directory_train = "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet2/Training_Data_Master/"
+    directory_validation = "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet2/Validation_Data_Master/"
+    directory_attack = "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet2/Attack_Data_Master/"
 
     train_files = readfilesfromAdir(directory_train)
     sub_dir_attack = get_attack_subdir(directory_attack)
-    # train = get_all_call_sequences(files)
     print("train.csv is created")
 
     # récupère les fichiers de chaque sous-dossier

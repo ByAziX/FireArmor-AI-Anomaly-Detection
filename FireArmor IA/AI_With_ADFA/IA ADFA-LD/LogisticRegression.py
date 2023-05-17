@@ -198,7 +198,7 @@ if __name__ == "__main__":
     import sys
 
 
-    filename = "/home/hugo/ISEN/Cours/FireArmor/FireArmor-AI-Anomaly-Detection/FireArmor IA/AI_With_ADFA/ADFA-LD/Attack_Data_Master/Meterpreter_9/UAD-Meterpreter-9-2462.txt"
+    filename = "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet2/Attack_Data_Master/Meterpreter_1/UAD-Meterpreter-1-16391.txt"
 
     mc = MyClassifier()
     mc.load_data()

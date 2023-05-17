@@ -196,13 +196,13 @@ if __name__ == "__main__":
 
     try:
             files = [
-        "FireArmor IA/AI_With_ADFA/ADFA-LD/Attack_Data_Master/Meterpreter_4/UAD-Meterpreter-4-1613.txt",
-        "FireArmor IA/AI_With_ADFA/IA ADFA-LD/tests/UVD-0008.txt",
-        "FireArmor IA/AI_With_ADFA/ADFA-LD/Attack_Data_Master/Web_Shell_9/UAD-WS9-1371.txt",
-        "FireArmor IA/AI_With_ADFA/ADFA-LD/Attack_Data_Master/Hydra_SSH_2/UAD-Hydra-SSH-2-1371.txt",
-        "FireArmor IA/AI_With_ADFA/ADFA-LD/Attack_Data_Master/Hydra_FTP_9/UAD-Hydra-FTP-9-961.txt",
-        "FireArmor IA/AI_With_ADFA/IA ADFA-LD/tests/UAD-Adduser-5-1371.txt",
-        "FireArmor IA/AI_With_ADFA/ADFA-LD/Attack_Data_Master/Java_Meterpreter_6/UAD-Java-Meterpreter-6-961.txt"
+        "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet2/Attack_Data_Master/Adduser_1/UAD-Adduser-1-2783.txt",
+        "/home/hugo/ISEN/Cours/FireArmor/FireArmor-AI-Anomaly-Detection/FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet2/Attack_Data_Master/Hydra_FTP_1/UAD-Hydra-FTP-1-9186.txt",
+        "FireArmor IA/AI_With_ADFA/IA ADFA-LD/tests/UAD-Hydra-SSH-7-2311.txt",
+        "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet2/Attack_Data_Master/Meterpreter_6/UAD-Meterpreter-6-17082.txt",
+        "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet2/Attack_Data_Master/Java_Meterpreter_1/UAD-Java-Meterpreter-1-19479.txt",
+        "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet2/Attack_Data_Master/Web_Shell_1/UAD-WS1-4605.txt",
+        "FireArmor IA/AI_With_ADFA/IA ADFA-LD/tests/UVD-0008.txt"
         ]  
         
             print(f"Loading ...")
