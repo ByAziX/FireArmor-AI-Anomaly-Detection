@@ -3,7 +3,7 @@
 ## Prérequis
   1. Python 3.7 ou supérieur
   2. Bibliothèques Python: numpy, pandas, scikit-learn, matplotlib, seaborn
-  3. Dataset ADFA-LD (disponible sur le site officiel)
+  3. Dataset ADFA-LD (disponible dans le github)
 
 
 ## Introduction
