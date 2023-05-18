@@ -65,8 +65,26 @@ def create_file(file, dataTrain, dataAttack, sub_dir_attack ):
                         # set the value to 1
                         if index_subdomain:
                             results[index_subdomain-1] = 1
+                            countLabel[index_subdomain-1] += 1
                             f.write(",%s\n" % ','.join(map(str, results)))
 
+
+def tableauDataSet(countLabel,dataTrain,dataAttack):
+    label = ['Adduser', 'Hydra_FTP', 'Hydra_SSH', 'Java_Meterpreter', 'Meterpreter', 'Web_Shell']
+    print('-' * 60)
+    print('{:<30s}{:<15s}'.format('Label', 'Count'))
+    print('-' * 60)
+    for i in range(0,len(label)):
+        if countLabel[i] > 0:
+            print('{:<30s}{:<15d}'.format(label[i],countLabel[i]))
+    print('-' * 60)
+
+    print('{:<30s}{:<15d}'.format('Nombre de fichiers d\'attaque : ', len(dataAttack)))
+    print('{:<30s}{:<15d}'.format('Nombre de fichiers de train : ', len(dataTrain)))
+    print('{:<30s}{:<15d}'.format('Nombre de fichiers de train : ', len(dataTrain)))
+    total_files = len(dataAttack) + len(dataTrain)
+    print('{:<30s}{:<15d}'.format('Nombre de fichiers total : ', total_files))
+    print('-' * 60)
 
 
 
@@ -79,10 +97,12 @@ if __name__ == "__main__":
     train_files = readfilesfromAdir(directory_train)
     sub_dir_attack = get_attack_subdir(directory_attack)
     print("train.csv is created")
-
+    countLabel = [0] * 6
     # récupère les fichiers de chaque sous-dossier
     attack_files = []
     for sub_dir in sub_dir_attack:
         attack_files.extend(readfilesfromAdir(sub_dir))
 
     create_file("train.csv", train_files, attack_files, sub_dir_attack)
+
+    tableauDataSet(countLabel,train_files,attack_files)
