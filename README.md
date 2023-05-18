@@ -1,7 +1,5 @@
 # FireArmor-AI-Anomaly-Detection
 
-# FireArmor-AI-Anomaly-Detection
-
 ## Prérequis
   1. Python 3.7 ou supérieur
   2. Bibliothèques Python: numpy, pandas, scikit-learn, matplotlib, seaborn
