@@ -11,7 +11,7 @@ Le dataset ADFA-LD (Advanced Data Mining and Its Applications Lab Dataset) est u
 
 Dans ce tutoriel, nous utiliserons l'algorithme de forêt aléatoire (Random Forest) pour créer un modèle qui détecte les anomalies dans les systèmes d'appels.
 
-# Étapes
+## Étapes
 
 ### 1. Préparation des données du DataSet ADFA-LD
 
