@@ -13,5 +13,5 @@ Dans ce tutoriel, nous utiliserons l'algorithme de forêt aléatoire (Random For
 
 # Étapes
 
-# 1. Préparation des données du dataSet
+# 1. Préparation des données du DataSet ADFA-LD
 
