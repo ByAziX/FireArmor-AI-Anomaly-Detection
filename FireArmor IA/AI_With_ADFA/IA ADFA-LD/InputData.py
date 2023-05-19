@@ -81,7 +81,6 @@ def tableauDataSet(countLabel,dataTrain,dataAttack):
 
     print('{:<30s}{:<15d}'.format('Nombre de fichiers d\'attaque : ', len(dataAttack)))
     print('{:<30s}{:<15d}'.format('Nombre de fichiers de train : ', len(dataTrain)))
-    print('{:<30s}{:<15d}'.format('Nombre de fichiers de train : ', len(dataTrain)))
     total_files = len(dataAttack) + len(dataTrain)
     print('{:<30s}{:<15d}'.format('Nombre de fichiers total : ', total_files))
     print('-' * 60)
