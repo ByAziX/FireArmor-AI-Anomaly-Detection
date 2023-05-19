@@ -3,6 +3,7 @@ from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.ensemble import RandomForestClassifier
 import pandas as pd
 import numpy as np
+import InputData 
 
 
 PREDICTIONS = {
@@ -195,15 +196,9 @@ if __name__ == "__main__":
     print("Training complete")
 
     try:
-            files = [
-        "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet2/Attack_Data_Master/Adduser_1/UAD-Adduser-1-2783.txt",
-        "/home/hugo/ISEN/Cours/FireArmor/FireArmor-AI-Anomaly-Detection/FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet2/Attack_Data_Master/Hydra_FTP_1/UAD-Hydra-FTP-1-9186.txt",
-        "FireArmor IA/AI_With_ADFA/IA ADFA-LD/tests/UAD-Hydra-SSH-7-2311.txt",
-        "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet2/Attack_Data_Master/Meterpreter_6/UAD-Meterpreter-6-17082.txt",
-        "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet2/Attack_Data_Master/Java_Meterpreter_1/UAD-Java-Meterpreter-1-19479.txt",
-        "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet2/Attack_Data_Master/Web_Shell_1/UAD-WS1-4605.txt",
-        "FireArmor IA/AI_With_ADFA/IA ADFA-LD/tests/UVD-0008.txt"
-        ]  
+            files = {}
+            file_directory = "FireArmor IA/AI_With_ADFA/IA ADFA-LD/tests/"
+            files = InputData.readfilesfromAdir(file_directory)
         
             print(f"Loading ...")
 
