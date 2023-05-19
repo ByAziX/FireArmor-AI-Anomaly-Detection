@@ -90,9 +90,9 @@ def tableauDataSet(countLabel,dataTrain,dataAttack):
 
 
 if __name__ == "__main__":
-    directory_train = "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet2/Training_Data_Master/"
-    directory_validation = "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet2/Validation_Data_Master/"
-    directory_attack = "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet2/Attack_Data_Master/"
+    directory_train = "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Training_Data_Master/"
+    directory_validation = "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Validation_Data_Master/"
+    directory_attack = "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/"
 
     train_files = readfilesfromAdir(directory_train)
     sub_dir_attack = get_attack_subdir(directory_attack)
