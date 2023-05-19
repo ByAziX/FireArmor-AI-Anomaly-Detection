@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-__author__ ="Ktian"
 import os
 import sys
 import numpy as np
