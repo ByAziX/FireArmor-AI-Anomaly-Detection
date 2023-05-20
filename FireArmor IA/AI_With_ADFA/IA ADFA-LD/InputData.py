@@ -25,7 +25,7 @@ def get_attack_subdir(path):
     return (subdirectories)
 
 
-def create_file(file, dataTrain, dataAttack, sub_dir_attack ):
+def create_file(file, dataTrain, dataAttack, sub_dir_attack):
     with open(file, 'w') as f:
         label = ['trace', 'Adduser', 'Hydra_FTP', 'Hydra_SSH', 'Java_Meterpreter', 'Meterpreter', 'Web_Shell']
         index = []
