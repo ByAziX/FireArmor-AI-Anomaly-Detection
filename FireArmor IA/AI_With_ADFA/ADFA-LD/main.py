@@ -9,8 +9,6 @@ def replace_syscall_with_number(input_file, csv_file, output_file):
         for row in reader:
             if not row or len(row) < 2:  # Skip the row if it is empty or if it doesn't have at least 2 elements
                 continue
-
-
             syscall_name_NR = row[0]
             syscall_number = row[1]
             syscall_name_sys = row[2].strip()
@@ -25,10 +23,7 @@ def replace_syscall_with_number(input_file, csv_file, output_file):
             if syscall_name[0] == '_':
                     syscall_name = syscall_name[1:]
 
-            if syscall_name in syscall_dict_sys:
-                # si syscall_name commence par un _ alors on le supprime
-                
-                    
+            if syscall_name in syscall_dict_sys:                
                 syscall_number = syscall_dict_sys[syscall_name]
                 syscall_number = syscall_number.strip()
                 output_file.write(syscall_number + ' ')
