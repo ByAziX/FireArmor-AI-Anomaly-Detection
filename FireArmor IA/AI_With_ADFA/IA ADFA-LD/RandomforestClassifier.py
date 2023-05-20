@@ -31,9 +31,6 @@ def load_data(train_data_path, validation_data_path):
         return None
     return train_data, validation_data, attack_data
 
-
-
-
 def get_X_y(df, attack_vector=None):
 
     if attack_vector is not None:
@@ -58,6 +55,21 @@ def transform_X(traces):
         X.append(temp)
     return np.array(X)
 
+def transform_attack(trace,attack_vector):
+    res = []
+    for arr in trace:
+        temp = [0]*len(attack_vector) + [350]
+        for size in range(2, 6):
+            for i in range(0, len(arr) - size):
+                sub = arr[i: i+size]
+                key = "-".join(map(str, sub))
+                if key in attack_vector:
+                    temp[attack_vector[key]] += 1
+        temp = np.array(temp, dtype="float64")
+        res.append(temp)
+    
+    return np.array(res)
+
     
 def prepare_vector(trace):
     d = {}
@@ -76,24 +88,8 @@ def prepare_vector(trace):
                     features.add(key)                               
     return d
 
-def transform_attack(trace,attack_vector):
-    res = []
-    for arr in trace:
-        temp = [0]*len(attack_vector) + [350]
-        for size in range(2, 6):
-            for i in range(0, len(arr) - size):
-                sub = arr[i: i+size]
-                key = "-".join(map(str, sub))
-                if key in attack_vector:
-                    temp[attack_vector[key]] += 1
-        temp = np.array(temp, dtype="float64")
-        res.append(temp)
-    
-    return np.array(res)
-        
-    
 
-def attack_train(attack_vector,attack_data):
+def train_attack(attack_vector,attack_data):
 
     print("\nEntraînement de la détection d'attaque en cours")
     traces = attack_data["trace"].apply(lambda x: x.split())
@@ -115,7 +111,7 @@ def attack_train(attack_vector,attack_data):
 
 
         
-def binary_train(attack_vector,attack_data,train_data,validation_data):
+def train_binary(attack_vector,attack_data,train_data,validation_data):
 
     print('-' * 60)
     print("Entraînement du classifieur binaire en cours")
@@ -196,8 +192,8 @@ if __name__ == "__main__":
     print("Training model")
     traces = attack_data["trace"].apply(lambda x: x.split())
     attack_vector = prepare_vector(traces)
-    binary_train(attack_vector,attack_data,train_data,validation_data)
-    attack_train(attack_vector,attack_data)
+    train_binary(attack_vector,attack_data,train_data,validation_data)
+    train_attack(attack_vector,attack_data)
     print("Training complete")
 
     print('-' * 60)
