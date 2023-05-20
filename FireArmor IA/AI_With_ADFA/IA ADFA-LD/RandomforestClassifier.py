@@ -17,8 +17,9 @@ PREDICTIONS = {
 }
 
 
-binary_classifier = RandomForestClassifier(n_estimators=100, random_state=42)
-attack_classifier = RandomForestClassifier(n_estimators=100, random_state=42)
+binary_classifier = RandomForestClassifier(n_estimators=150, class_weight={0: 1.0, 1: 2.0})
+attack_classifier = RandomForestClassifier(n_estimators=150)
+
 
 
 def load_data(train_data_path, validation_data_path):
@@ -139,20 +140,21 @@ def train_binary(attack_vector,attack_data,train_data,validation_data):
 
 
 
-def predict(trace, attack_vector,predict_one=False):
+def predict(trace, attack_vector, threshold=0.13, predict_one=False):
     if isinstance(trace, str):
         trace = np.array([list(map(int, trace.split()))])
         
     X_bin = transform_X(trace)
-    bp = binary_classifier.predict(X_bin)
-    
-    if predict_one and not bp[0]:
-            print("No attack")
-            return 0
+    bp = binary_classifier.predict_proba(X_bin)[:, 1]
+    print("Binary prediction :", bp[0])
+
+    if bp[0] < threshold:
+        print("No attack")
+        return 0
     print("Attack")
     X_atk = transform_attack(trace, attack_vector)
     attack_predict = attack_classifier.predict(X_atk) + 1
-
+    
     if predict_one:
         return attack_predict[0]
     return attack_predict
