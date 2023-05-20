@@ -61,7 +61,7 @@ __NR_vhangup,58,sys_vhangup
 __NR_pipe2,59,sys_pipe2
 __NR_quotactl,60,sys_quotactl
 __NR_getdents64,61,sys_getdents64
-__NR3264_lseek,62,sys_llseek,sys_lseek
+__NR3264_lseek,62,sys_llseek
 __NR_read,63,sys_read
 __NR_write,64,sys_write
 __NR_readv,65,sys_readv
