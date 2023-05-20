@@ -40,4 +40,4 @@ def replace_syscall_with_number(input_file, csv_file, output_file):
 
 
 
-replace_syscall_with_number('FireArmor IA/AI_With_ADFA/ADFA-LD/syscall_names.txt', 'FireArmor IA/AI_With_ADFA/ADFA-LD/label.csv', 'FireArmor IA/AI_With_ADFA/ADFA-LD/syscall_num.txt')
+replace_syscall_with_number('FireArmor IA/AI_With_ADFA/ADFA-LD/NotreDataset/syscall_namesHYDRASSH.txt', 'FireArmor IA/AI_With_ADFA/ADFA-LD/label.csv', 'FireArmor IA/AI_With_ADFA/ADFA-LD/syscall_num.txt')
