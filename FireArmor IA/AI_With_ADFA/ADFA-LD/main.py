@@ -24,17 +24,19 @@ def replace_syscall_with_number(input_file, csv_file, output_file):
             syscall_name = line.strip()
             if syscall_name[0] == '_':
                     syscall_name = syscall_name[1:]
-                    
+
             if syscall_name in syscall_dict_sys:
                 # si syscall_name commence par un _ alors on le supprime
                 
                     
                 syscall_number = syscall_dict_sys[syscall_name]
-                output_file.write(syscall_number + '\n')
+                syscall_number = syscall_number.strip()
+                output_file.write(syscall_number + ' ')
 
             elif syscall_name in syscall_dict_NR:
                 syscall_number = syscall_dict_NR[syscall_name]
-                output_file.write(syscall_number + '\n')
+                syscall_number = syscall_number.strip()
+                output_file.write(syscall_number + ' ')
 
             else:
                 print('Syscall name not found: ' + syscall_name)
