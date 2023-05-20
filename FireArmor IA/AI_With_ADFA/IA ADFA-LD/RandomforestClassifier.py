@@ -59,11 +59,11 @@ def transform_X(traces):
     return np.array(X)
 
     
-def prepare_vector(X):
+def prepare_vector(trace):
     d = {}
     features = set()
     ind = 0
-    for arr in X:
+    for arr in trace:
         for size in range(2, 6):
             for i in range(0, len(arr) - size):
                 sub = arr[i: i+size]
@@ -76,9 +76,9 @@ def prepare_vector(X):
                     features.add(key)                               
     return d
 
-def transform_attack(X,attack_vector):
+def transform_attack(trace,attack_vector):
     res = []
-    for arr in X:
+    for arr in trace:
         temp = [0]*len(attack_vector) + [350]
         for size in range(2, 6):
             for i in range(0, len(arr) - size):
@@ -155,12 +155,12 @@ def binary_train(attack_vector,attack_data,train_data,validation_data,metrics):
 
 
 
-def predict(X, attack_vector,predict_one=False):
+def predict(trace, attack_vector,predict_one=False):
     global logging
-    if isinstance(X, str):
-        X = np.array([list(map(int, X.split()))])
+    if isinstance(trace, str):
+        trace = np.array([list(map(int, trace.split()))])
         
-    X_bin = transform_X(X)
+    X_bin = transform_X(trace)
     bp = binary_classifier.predict(X_bin)
     
     if predict_one and not bp[0]:
@@ -168,7 +168,7 @@ def predict(X, attack_vector,predict_one=False):
             print("No attack")
         return 0
     print("Attack")
-    X_atk = transform_attack(X, attack_vector)
+    X_atk = transform_attack(trace, attack_vector)
     attack_predict = attack_classifier.predict(X_atk) + 1
 
     if predict_one:

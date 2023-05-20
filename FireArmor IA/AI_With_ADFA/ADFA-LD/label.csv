@@ -1,0 +1,264 @@
+Number,Name,Definition
+__NR_io_setup,0,sys_io_setup
+__NR_io_destroy,1,sys_io_destroy
+__NR_io_submit,2,sys_io_submit
+__NR_io_cancel,3,sys_io_cancel
+__NR_io_getevents,4,sys_io_getevents
+__NR_setxattr,5,sys_setxattr
+__NR_lsetxattr,6,sys_lsetxattr
+__NR_fsetxattr,7,sys_fsetxattr
+__NR_getxattr,8,sys_getxattr
+__NR_lgetxattr,9,sys_lgetxattr
+__NR_fgetxattr,10,sys_fgetxattr
+__NR_listxattr,11,sys_listxattr
+__NR_llistxattr,12,sys_llistxattr
+__NR_flistxattr,13,sys_flistxattr
+__NR_removexattr,14,sys_removexattr
+__NR_lremovexattr,15,sys_lremovexattr
+__NR_fremovexattr,16,sys_fremovexattr
+__NR_getcwd,17,sys_getcwd
+__NR_lookup_dcookie,18,sys_lookup_dcookie
+__NR_eventfd2,19,sys_eventfd2
+__NR_epoll_create1,20,sys_epoll_create1
+__NR_epoll_ctl,21,sys_epoll_ctl
+__NR_epoll_pwait,22,sys_epoll_pwait
+__NR_dup,23,sys_dup
+__NR_dup3,24,sys_dup3
+__NR3264_fcntl,25,sys_fcntl64,sys_fcntl
+__NR_inotify_init1,26,sys_inotify_init1
+__NR_inotify_add_watch,27,sys_inotify_add_watch
+__NR_inotify_rm_watch,28,sys_inotify_rm_watch
+__NR_ioctl,29,sys_ioctl
+__NR_ioprio_set,30,sys_ioprio_set
+__NR_ioprio_get,31,sys_ioprio_get
+__NR_flock,32,sys_flock
+__NR_mknodat,33,sys_mknodat
+__NR_mkdirat,34,sys_mkdirat
+__NR_unlinkat,35,sys_unlinkat
+__NR_symlinkat,36,sys_symlinkat
+__NR_linkat,37,sys_linkat
+__NR_renameat,38,sys_renameat
+__NR_umount2,39,sys_umount
+__NR_mount,40,sys_mount
+__NR_pivot_root,41,sys_pivot_root
+__NR_nfsservctl,42,sys_nfsservctl
+__NR3264_statfs,43,sys_statfs64,sys_statfs
+__NR3264_fstatfs,44,sys_fstatfs64,sys_fstatfs
+__NR3264_truncate,45,sys_truncate64,sys_truncate
+__NR3264_ftruncate,46,sys_ftruncate64,sys_ftruncate
+__NR_fallocate,47,sys_fallocate
+__NR_faccessat,48,sys_faccessat
+__NR_chdir,49,sys_chdir
+__NR_fchdir,50,sys_fchdir
+__NR_chroot,51,sys_chroot
+__NR_fchmod,52,sys_fchmod
+__NR_fchmodat,53,sys_fchmodat
+__NR_fchownat,54,sys_fchownat
+__NR_fchown,55,sys_fchown
+__NR_openat,56,sys_openat
+__NR_close,57,sys_close
+__NR_vhangup,58,sys_vhangup
+__NR_pipe2,59,sys_pipe2
+__NR_quotactl,60,sys_quotactl
+__NR_getdents64,61,sys_getdents64
+__NR3264_lseek,62,sys_llseek,sys_lseek
+__NR_read,63,sys_read
+__NR_write,64,sys_write
+__NR_readv,65,sys_readv
+__NR_writev,66,sys_writev
+__NR_pread64,67,sys_pread64
+__NR_pwrite64,68,sys_pwrite64
+__NR_preadv,69,sys_preadv
+__NR_pwritev,70,sys_pwritev
+__NR3264_sendfile,71,sys_sendfile64,sys_sendfile
+__NR_pselect6,72,sys_pselect6
+__NR_ppoll,73,sys_ppoll
+__NR_signalfd4,74,sys_signalfd4
+__NR_vmsplice,75,sys_vmsplice
+__NR_splice,76,sys_splice
+__NR_tee,77,sys_tee
+__NR_readlinkat,78,sys_readlinkat
+__NR3264_fstatat,79,sys_fstatat64,sys_newfstatat
+__NR3264_fstat,80,sys_fstat64,sys_newfstat
+__NR_sync,81,sys_sync
+__NR_fsync,82,sys_fsync
+__NR_fdatasync,83,sys_fdatasync
+__NR_sync_file_range,84,sys_sync_file_range
+__NR_timerfd_create,85,sys_timerfd_create
+__NR_timerfd_settime,86,sys_timerfd_settime
+__NR_timerfd_gettime,87,sys_timerfd_gettime
+__NR_utimensat,88,sys_utimensat
+__NR_acct,89,sys_acct
+__NR_capget,90,sys_capget
+__NR_capset,91,sys_capset
+__NR_personality,92,sys_personality
+__NR_exit,93,sys_exit
+__NR_exit_group,94,sys_exit_group
+__NR_waitid,95,sys_waitid
+__NR_set_tid_address,96,sys_set_tid_address
+__NR_unshare,97,sys_unshare
+__NR_futex,98,sys_futex
+__NR_set_robust_list,99,sys_set_robust_list
+__NR_get_robust_list,100,sys_get_robust_list
+__NR_nanosleep, 101, sys_nanosleep
+__NR_getitimer, 102, sys_getitimer
+__NR_setitimer, 103, sys_setitimer
+__NR_kexec_load, 104, sys_kexec_load
+__NR_init_module, 105, sys_init_module
+__NR_delete_module, 106, sys_delete_module
+__NR_timer_create, 107, sys_timer_create
+__NR_timer_gettime, 108, sys_timer_gettime
+__NR_timer_getoverrun, 109, sys_timer_getoverrun
+__NR_timer_settime, 110, sys_timer_settime
+__NR_timer_delete, 111, sys_timer_delete
+__NR_clock_settime, 112, sys_clock_settime
+__NR_clock_gettime, 113, sys_clock_gettime
+__NR_clock_getres, 114, sys_clock_getres
+__NR_clock_nanosleep, 115, sys_clock_nanosleep
+__NR_syslog, 116, sys_syslog
+__NR_ptrace, 117, sys_ptrace
+__NR_sched_setparam, 118, sys_sched_setparam
+__NR_sched_setscheduler, 119, sys_sched_setscheduler
+__NR_sched_getscheduler, 120, sys_sched_getscheduler
+__NR_sched_getparam, 121, sys_sched_getparam
+__NR_sched_setaffinity, 122, sys_sched_setaffinity
+__NR_sched_getaffinity, 123, sys_sched_getaffinity
+__NR_sched_yield, 124, sys_sched_yield
+__NR_sched_get_priority_max, 125, sys_sched_get_priority_max
+__NR_sched_get_priority_min, 126, sys_sched_get_priority_min
+__NR_sched_rr_get_interval, 127, sys_sched_rr_get_interval
+__NR_restart_syscall, 128, sys_restart_syscall
+__NR_kill, 129, sys_kill
+__NR_tkill, 130, sys_tkill
+__NR_tgkill, 131, sys_tgkill
+__NR_sigaltstack, 132, sys_sigaltstack
+__NR_rt_sigsuspend, 133, sys_rt_sigsuspend
+__NR_rt_sigaction, 134, sys_rt_sigaction
+__NR_rt_sigprocmask, 135, sys_rt_sigprocmask
+__NR_rt_sigpending, 136, sys_rt_sigpending
+__NR_rt_sigtimedwait, 137, sys_rt_sigtimedwait
+__NR_rt_sigqueueinfo, 138, sys_rt_sigqueueinfo
+__NR_rt_sigreturn, 139, sys_rt_sigreturn
+__NR_setpriority, 140, sys_setpriority
+__NR_getpriority, 141, sys_getpriority
+__NR_reboot, 142, sys_reboot
+__NR_setregid, 143, sys_setregid
+__NR_setgid, 144, sys_setgid
+__NR_setreuid, 145, sys_setreuid
+__NR_setuid, 146, sys_setuid
+__NR_setresuid, 147, sys_setresuid
+__NR_getresuid, 148, sys_getresuid
+__NR_setresgid, 149, sys_setresgid
+__NR_getresgid, 150, sys_getresgid
+__NR_setfsuid, 151, sys_setfsuid
+__NR_setfsgid, 152, sys_setfsgid
+__NR_times, 153, sys_times
+__NR_setpgid, 154, sys_setpgid
+__NR_getpgid, 155, sys_getpgid
+__NR_getsid, 156, sys_getsid
+__NR_setsid, 157, sys_setsid
+__NR_getgroups, 158, sys_getgroups
+__NR_setgroups, 159, sys_setgroups
+__NR_uname, 160, sys_newuname
+__NR_sethostname, 161, sys_sethostname
+__NR_setdomainname, 162, sys_setdomainname
+__NR_getrlimit, 163, sys_getrlimit
+__NR_setrlimit, 164, sys_setrlimit
+__NR_getrusage, 165, sys_getrusage
+__NR_umask, 166, sys_umask
+__NR_prctl, 167, sys_prctl
+__NR_getcpu, 168, sys_getcpu
+__NR_gettimeofday, 169, sys_gettimeofday
+__NR_settimeofday, 170, sys_settimeofday
+__NR_adjtimex, 171, sys_adjtimex
+__NR_getpid, 172, sys_getpid
+__NR_getppid, 173, sys_getppid
+__NR_getuid, 174, sys_getuid
+__NR_geteuid, 175, sys_geteuid
+__NR_getgid, 176, sys_getgid
+__NR_getegid, 177, sys_getegid
+__NR_gettid, 178, sys_gettid
+__NR_sysinfo, 179, sys_sysinfo
+__NR_mq_open, 180, sys_mq_open
+__NR_mq_unlink, 181, sys_mq_unlink
+__NR_mq_timedsend, 182, sys_mq_timedsend
+__NR_mq_timedreceive, 183, sys_mq_timedreceive
+__NR_mq_notify, 184, sys_mq_notify
+__NR_mq_getsetattr, 185, sys_mq_getsetattr
+__NR_msgget, 186, sys_msgget
+__NR_msgctl, 187, sys_msgctl
+__NR_msgrcv, 188, sys_msgrcv
+__NR_msgsnd, 189, sys_msgsnd
+__NR_semget, 190, sys_semget
+__NR_semctl, 191, sys_semctl
+__NR_semtimedop, 192, sys_semtimedop
+__NR_semop, 193, sys_semop
+__NR_shmget, 194, sys_shmget
+__NR_shmctl, 195, sys_shmctl
+__NR_shmat, 196, sys_shmat
+__NR_shmdt, 197, sys_shmdt
+__NR_socket, 198, sys_socket
+__NR_socketpair, 199, sys_socketpair
+__NR_bind, 200, sys_bind
+__NR_listen, 201, sys_listen
+__NR_accept, 202, sys_accept
+__NR_connect, 203, sys_connect
+__NR_getsockname, 204, sys_getsockname
+__NR_getpeername, 205, sys_getpeername
+__NR_sendto, 206, sys_sendto
+__NR_recvfrom, 207, sys_recvfrom
+__NR_setsockopt, 208, sys_setsockopt
+__NR_getsockopt, 209, sys_getsockopt
+__NR_shutdown, 210, sys_shutdown
+__NR_sendmsg, 211, sys_sendmsg
+__NR_recvmsg, 212, sys_recvmsg
+__NR_readahead, 213, sys_readahead
+__NR_brk, 214, sys_brk
+__NR_munmap, 215, sys_munmap
+__NR_mremap, 216, sys_mremap
+__NR_add_key, 217, sys_add_key
+__NR_request_key, 218, sys_request_key
+__NR_keyctl, 219, sys_keyctl
+__NR_clone, 220, sys_clone
+__NR_execve, 221, sys_execve
+__NR3264_mmap, 222, sys_mmap2
+__NR3264_fadvise64, 223, sys_fadvise64_64
+__NR_swapon, 224, sys_swapon
+__NR_swapoff, 225, sys_swapoff
+__NR_mprotect, 226, sys_mprotect
+__NR_msync, 227, sys_msync
+__NR_mlock, 228, sys_mlock
+__NR_munlock, 229, sys_munlock
+__NR_mlockall, 230, sys_mlockall
+__NR_munlockall, 231, sys_munlockall
+__NR_mincore, 232, sys_mincore
+__NR_madvise, 233, sys_madvise
+__NR_remap_file_pages, 234, sys_remap_file_pages
+__NR_mbind, 235, sys_mbind
+__NR_get_mempolicy, 236, sys_get_mempolicy
+__NR_set_mempolicy, 237, sys_set_mempolicy
+__NR_migrate_pages, 238, sys_migrate_pages
+__NR_move_pages, 239, sys_move_pages
+__NR_rt_tgsigqueueinfo, 240, sys_rt_tgsigqueueinfo
+__NR_perf_event_open, 241, sys_perf_event_open
+__NR_accept4, 242, sys_accept4
+__NR_recvmmsg, 243, sys_recvmmsg
+__NR_arch_specific_syscall, 244, 
+__NR_wait4, 260, sys_wait4
+__NR_prlimit64, 261, sys_prlimit64
+__NR_fanotify_init, 262, sys_fanotify_init
+__NR_fanotify_mark, 263, sys_fanotify_mark
+__NR_name_to_handle_at, 264, sys_name_to_handle_at
+__NR_open_by_handle_at, 265, sys_open_by_handle_at
+__NR_clock_adjtime, 266, sys_clock_adjtime
+__NR_syncfs, 267, sys_syncfs
+__NR_setns, 268, sys_setns
+__NR_sendmmsg, 269, sys_sendmmsg
+__NR_process_vm_readv, 270, sys_process_vm_readv
+__NR_process_vm_writev, 271, sys_process_vm_writev
+__NR_kcmp, 272, sys_kcmp
+__NR_finit_module, 273, sys_finit_module
+__NR_sched_setattr, 274, sys_sched_setattr
+__NR_sched_getattr, 275, sys_sched_getattr
+__NR_renameat2, 276, sys_renameat2
+__NR_seccomp, 277, sys_seccomp
