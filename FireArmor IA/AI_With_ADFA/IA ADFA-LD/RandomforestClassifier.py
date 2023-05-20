@@ -192,7 +192,6 @@ if __name__ == "__main__":
     print("Training model")
     traces = attack_data["trace"].apply(lambda x: x.split())
     attack_vector = prepare_vector(traces)
-    print(attack_vector)
     train_binary(attack_vector,attack_data,train_data,validation_data)
     train_attack(attack_vector,attack_data)
     print("Training complete")
