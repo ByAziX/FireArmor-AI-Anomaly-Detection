@@ -122,7 +122,7 @@ def get_syscall_from_Meterpreter():
     payload = "meterpreterPayload"
     csv_file = 'FireArmor IA/AI_With_ADFA/ADFA-LD/label.csv'
 
-    ip = "192.168.1.15"
+    ip = get_my_ip()
     print('your ip :',ip)
 
     kill_process_by_port(4444)
@@ -144,10 +144,7 @@ def get_syscall_from_Meterpreter():
     # Exécuter la commande cmd4 dans un terminal
     print("process2")
     process2 = subprocess.Popen(cmd4, shell=True)
-    process2.wait()
         
-    process1.kill()
-    process2.kill()
         
         
         
