@@ -190,7 +190,7 @@ def train_attack(attack_vector,attack_data):
 
 # Prediction de la dection d'une attaque ou non et du type d'attaque
 
-def predict(trace, attack_vector, threshold=0.13, predict_one=False):
+def predict(trace, attack_vector, threshold=0.13):
     if isinstance(trace, str):
         trace = np.array([list(map(int, trace.split()))])
         
@@ -201,13 +201,11 @@ def predict(trace, attack_vector, threshold=0.13, predict_one=False):
     if bp[0] < threshold:
         print("No attack")
         return 0
-    print("Attack")
-    X_atk = effectuer_transformation_attaque(trace, attack_vector)
-    attack_predict = attack_classifier.predict(X_atk) + 1
-    
-    if predict_one:
+    else:
+        print("Attack")
+        X_atk = effectuer_transformation_attaque(trace, attack_vector)
+        attack_predict = attack_classifier.predict(X_atk) + 1
         return attack_predict[0]
-    return attack_predict
 
 # Test de l'IA avec des attaques
 
@@ -222,7 +220,7 @@ def testIAWithSomeAttack():
             with open(filename) as fs:
                 trace = fs.read().strip()
             print("Fichier envoyé à l'IA : ", filename)
-            pred = PREDICTIONS.get(predict(trace,attack_vector, predict_one=True), "-")
+            pred = PREDICTIONS.get(predict(trace,attack_vector), "-")
             print("VERDICT:", pred)
             print('-' * 60)
 
