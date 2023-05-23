@@ -156,10 +156,6 @@ def train_binary(attack_data,train_data,validation_data):
     pred_a = binary_classifier.predict(X_attack)
     y_pred = binary_classifier.predict(X_test)
     
-    pred_val = pred_val
-    pred_a = pred_a
-    y_pred = y_pred
-    
     print("Précision globale du classifieur binaire sur les données de test :", accuracy_score(y_test, y_pred))
     print("Précision du classifieur binaire sur les attaques uniquement :", accuracy_score([1 for _ in range(len(pred_a))], pred_a))
     print("Précision du classifieur binaire sur la validation uniquement :", accuracy_score([0 for _ in range(len(pred_val))], pred_val))
