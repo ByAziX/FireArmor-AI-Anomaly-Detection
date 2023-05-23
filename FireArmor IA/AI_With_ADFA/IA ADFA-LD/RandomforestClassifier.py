@@ -45,7 +45,7 @@ def get_X_y(df, attack_vector=None):
     return X, y
 
 
-
+# Fonction pour effectuer la transformation des données pour le binaire d'attaque
 def transformer_donnees(traces):
     # Initialiser une liste pour stocker les résultats
     donnees_transformees = []
@@ -70,7 +70,7 @@ def transformer_donnees(traces):
     return np.array(donnees_transformees)
 
 
-
+# Transformation des données pour l'entrainement du classifieur d'attaque (Type d'attaque)
 def effectuer_transformation_attaque(traces, vecteur_attaque):
     # Initialiser une liste pour stocker les résultats
     resultats = []
@@ -102,7 +102,8 @@ def effectuer_transformation_attaque(traces, vecteur_attaque):
     return np.array(resultats)
 
 
-    
+# Préparation du vecteur d'attaque pour l'entrainement du classifieur d'attaque (Type d'attaque)
+
 def preparer_vecteur(traces):
     # Initialiser un dictionnaire pour stocker les vecteurs d'attaque
     vecteur_attaque = {}
@@ -137,29 +138,7 @@ def preparer_vecteur(traces):
     # Retourner le vecteur d'attaque
     return vecteur_attaque
 
-
-def train_attack(attack_vector,attack_data):
-
-    print("\nEntraînement de la détection d'attaque en cours")
-    traces = attack_data["trace"].apply(lambda x: x.split())
-
-    X, y = get_X_y(attack_data,attack_vector)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
-
-   
-    y_train = y_train.argmax(axis=1)
-    y_test = y_test.argmax(axis=1)
-     
-    attack_classifier.fit(X_train, y_train)
-    
-    y_pred = attack_classifier.predict(X_test)
-    
-    print("\nPrécision de la détection d'attaque :", accuracy_score(y_test, y_pred))
-
-    return y_test,y_pred
-
-
-        
+# Detection d'une attaque ou non
 def train_binary(attack_data,train_data,validation_data):
 
     print('-' * 60)
@@ -184,9 +163,32 @@ def train_binary(attack_data,train_data,validation_data):
     print("Précision globale du classifieur binaire sur les données de test :", accuracy_score(y_test, y_pred))
     print("Précision du classifieur binaire sur les attaques uniquement :", accuracy_score([1 for _ in range(len(pred_a))], pred_a))
     print("Précision du classifieur binaire sur la validation uniquement :", accuracy_score([0 for _ in range(len(pred_val))], pred_val))
-    return y_test,pred_val,pred_a,y_pred
+    print('-' * 60)
 
 
+# Detection du type d'attaque
+
+def train_attack(attack_vector,attack_data):
+
+    print("\nEntraînement de la détection d'attaque en cours")
+    traces = attack_data["trace"].apply(lambda x: x.split())
+
+    X, y = get_X_y(attack_data,attack_vector)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+
+   
+    y_train = y_train.argmax(axis=1)
+    y_test = y_test.argmax(axis=1)
+     
+    attack_classifier.fit(X_train, y_train)
+    
+    y_pred = attack_classifier.predict(X_test)
+    
+    print("\nPrécision de la détection d'attaque :", accuracy_score(y_test, y_pred))
+
+    print('-' * 60)
+
+# Prediction de la dection d'une attaque ou non et du type d'attaque
 
 def predict(trace, attack_vector, threshold=0.13, predict_one=False):
     if isinstance(trace, str):
@@ -207,6 +209,7 @@ def predict(trace, attack_vector, threshold=0.13, predict_one=False):
         return attack_predict[0]
     return attack_predict
 
+# Test de l'IA avec des attaques
 
 def testIAWithSomeAttack():
     try:
@@ -229,7 +232,6 @@ def testIAWithSomeAttack():
     
 
 
-# Le reste du code reste inchangé...
 if __name__ == "__main__":
     
     
