@@ -149,7 +149,7 @@ def train_binary(attack_data,train_data,validation_data):
     X_attack, y_attack = get_X_y(attack_data)
     X_val, y_val = get_X_y(validation_data)
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
     binary_classifier.fit(X_train, y_train)
 
     pred_val = binary_classifier.predict(X_val)
@@ -170,12 +170,11 @@ def train_attack(attack_vector,attack_data):
     traces = attack_data["trace"].apply(lambda x: x.split())
 
     X, y = get_X_y(attack_data,attack_vector)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
-   
     y_train = y_train.argmax(axis=1)
     y_test = y_test.argmax(axis=1)
-     
+    
     attack_classifier.fit(X_train, y_train)
     
     y_pred = attack_classifier.predict(X_test)
