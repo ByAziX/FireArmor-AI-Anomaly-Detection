@@ -36,58 +36,106 @@ def get_X_y(df, attack_vector=None):
 
     if attack_vector is not None:
         traces = df["trace"].apply(lambda x: x.split())
-        X = transform_attack(traces, attack_vector)
+        X = effectuer_transformation_attaque(traces, attack_vector)
     else:
         traces = df["trace"].apply(lambda x: list(map(int, x.split())))
-        X = transform_X(traces)
+        X = transformer_donnees(traces)
 
     y = np.array(df.iloc[:, 2:])
     return X, y
 
 
-def transform_X(traces):
-    X = []
-    for arr in traces:
-        temp = [0] * 340
-        for i in arr:
-            if i > 340:
+
+def transformer_donnees(traces):
+    # Initialiser une liste pour stocker les résultats
+    donnees_transformees = []
+
+    # Parcourir chaque trace dans les traces
+    for trace in traces:
+        # Créer une liste temporaire avec 340 zéros
+        temp_liste = [0] * 340
+
+        # Parcourir chaque élément dans la trace
+        for element in trace:
+            # Ignorer les éléments supérieurs à 340
+            if element > 340:
                 continue
-            temp[i - 1] += 1
-        X.append(temp)
-    return np.array(X)
+            # Incrémenter le compte à l'index correspondant de la liste temporaire
+            temp_liste[element - 1] += 1
 
-def transform_attack(trace,attack_vector):
-    res = []
-    for arr in trace:
-        temp = [0]*len(attack_vector) + [350]
-        for size in range(2, 6):
-            for i in range(0, len(arr) - size):
-                sub = arr[i: i+size]
-                key = "-".join(map(str, sub))
-                if key in attack_vector:
-                    temp[attack_vector[key]] += 1
-        temp = np.array(temp, dtype="float64")
-        res.append(temp)
-    
-    return np.array(res)
+        # Ajouter la liste temporaire aux données transformées
+        donnees_transformees.append(temp_liste)
+
+    # Retourner les données transformées comme un tableau numpy
+    return np.array(donnees_transformees)
+
+
+
+def effectuer_transformation_attaque(traces, vecteur_attaque):
+    # Initialiser une liste pour stocker les résultats
+    resultats = []
+
+    # Parcourir chaque trace dans les traces
+    for trace in traces:
+        # Créer une matrice temporaire avec des zéros de la taille du vecteur d'attaque et ajouter 350 à la fin
+        temp_matrice = [0]*len(vecteur_attaque) + [350]
+
+        # Parcourir une plage de tailles de 2 à 5
+        for taille in range(2, 6):
+            # Parcourir la trace actuelle avec la taille actuelle
+            for index in range(0, len(trace) - taille):
+                # Créer un sous-ensemble de la trace
+                sous_ensemble = trace[index: index+taille]
+
+                # Créer une clé en joignant les éléments du sous-ensemble avec un tiret
+                cle = "-".join(map(str, sous_ensemble))
+
+                # Si la clé est dans le vecteur d'attaque, augmenter le compte dans la matrice temporaire
+                if cle in vecteur_attaque:
+                    temp_matrice[vecteur_attaque[cle]] += 1
+
+        # Convertir la matrice temporaire en un tableau numpy et l'ajouter aux résultats
+        temp_matrice = np.array(temp_matrice, dtype="float64")
+        resultats.append(temp_matrice)
+
+    # Retourner les résultats comme un tableau numpy
+    return np.array(resultats)
+
 
     
-def prepare_vector(trace):
-    d = {}
-    features = set()
-    ind = 0
-    for arr in trace:
-        for size in range(2, 6):
-            for i in range(0, len(arr) - size):
-                sub = arr[i: i+size]
-                key = "-".join(sub)
-                if key in features:
-                    if key not in d:
-                        d[key] = ind
-                        ind += 1
+def preparer_vecteur(traces):
+    # Initialiser un dictionnaire pour stocker les vecteurs d'attaque
+    vecteur_attaque = {}
+
+    # Initialiser un ensemble pour stocker les caractéristiques uniques
+    caracteristiques = set()
+
+    # Initialiser un index pour suivre l'index actuel dans le vecteur d'attaque
+    index = 0
+
+    # Parcourir chaque trace dans les traces
+    for trace in traces:
+        # Parcourir une plage de tailles de 2 à 5
+        for taille in range(2, 6):
+            # Parcourir la trace actuelle avec la taille actuelle
+            for i in range(0, len(trace) - taille):
+                # Créer un sous-ensemble de la trace
+                sous_ensemble = trace[i: i+taille]
+
+                # Créer une clé en joignant les éléments du sous-ensemble avec un tiret
+                cle = "-".join(sous_ensemble)
+
+                # Si la clé est dans les caractéristiques et pas dans le vecteur d'attaque, ajouter la clé au vecteur d'attaque
+                if cle in caracteristiques:
+                    if cle not in vecteur_attaque:
+                        vecteur_attaque[cle] = index
+                        index += 1
+                # Sinon, si la clé n'est pas dans les caractéristiques, ajouter la clé aux caractéristiques
                 else:
-                    features.add(key)                               
-    return d
+                    caracteristiques.add(cle)
+
+    # Retourner le vecteur d'attaque
+    return vecteur_attaque
 
 
 def train_attack(attack_vector,attack_data):
@@ -112,7 +160,7 @@ def train_attack(attack_vector,attack_data):
 
 
         
-def train_binary(attack_vector,attack_data,train_data,validation_data):
+def train_binary(attack_data,train_data,validation_data):
 
     print('-' * 60)
     print("Entraînement du classifieur binaire en cours")
@@ -144,7 +192,7 @@ def predict(trace, attack_vector, threshold=0.13, predict_one=False):
     if isinstance(trace, str):
         trace = np.array([list(map(int, trace.split()))])
         
-    X_bin = transform_X(trace)
+    X_bin = transformer_donnees(trace)
     bp = binary_classifier.predict_proba(X_bin)[:, 1]
     print("Binary prediction :", bp[0])
 
@@ -152,7 +200,7 @@ def predict(trace, attack_vector, threshold=0.13, predict_one=False):
         print("No attack")
         return 0
     print("Attack")
-    X_atk = transform_attack(trace, attack_vector)
+    X_atk = effectuer_transformation_attaque(trace, attack_vector)
     attack_predict = attack_classifier.predict(X_atk) + 1
     
     if predict_one:
@@ -193,8 +241,8 @@ if __name__ == "__main__":
     print('-' * 60)
     print("Training model")
     traces = attack_data["trace"].apply(lambda x: x.split())
-    attack_vector = prepare_vector(traces)
-    train_binary(attack_vector,attack_data,train_data,validation_data)
+    attack_vector = preparer_vecteur(traces)
+    train_binary(attack_data,train_data,validation_data)
     train_attack(attack_vector,attack_data)
     print("Training complete")
 
