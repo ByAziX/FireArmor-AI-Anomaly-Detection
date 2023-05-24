@@ -6,7 +6,8 @@ import os
 import multiprocessing
 import netifaces
 from pymetasploit3.msfrpc import MsfRpcClient
-
+import json
+import re
 
 
 
@@ -81,7 +82,7 @@ def get_syscall_from_hydra_http():
     process = subprocess.Popen(cmd2, shell=True)
     process.wait()
 
-    replace_syscall_with_number(syscall_names_file_base, csv_file, 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Hydra_SSH_11/UAD-Hydra-SSH-1-0.txt')
+    replace_syscall_with_number(syscall_names_file_base, 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Hydra_SSH_11/UAD-Hydra-SSH-1-0.txt')
 
     
 
@@ -115,7 +116,7 @@ def get_syscall_from_Meterpreter():
     process = subprocess.Popen(cmd4, shell=True)
 
     
-    replace_syscall_with_number('syscall_names.txt', csv_file, f'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Meterpreter_11/UAD-Meterpreter-11-0.txt')
+    replace_syscall_with_number('syscall_names.txt', f'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Meterpreter_11/UAD-Meterpreter-11-0.txt')
     
 
 
@@ -205,45 +206,46 @@ def get_syscall_from_Meterpreter():
     replace_syscall_with_number(syscall_names_file_base, csv_file, 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Meterpreter_11/UAD-Meterpreter-11-0.txt')
 '''
 
+def get_systemcall_from_your_computer():
+    syscall_regex = r'#define __NR(?:3264_)?(\w+)\s+(\d+)'
 
-def replace_syscall_with_number(input_file, csv_file, output_file):
-    syscall_dict_sys = {}
-    syscall_dict_NR = {}
-    with open(csv_file, 'r') as csv_file:
-        reader = csv.reader(csv_file)
-        for row in reader:
-            if not row or len(row) < 2:  # Skip the row if it is empty or if it doesn't have at least 2 elements
-                continue
-            syscall_name_NR = row[0]
-            syscall_number = row[1]
-            syscall_name_sys = row[2].strip()
-            syscall_dict_NR[syscall_name_NR] = syscall_number
-            syscall_dict_sys[syscall_name_sys] = syscall_number
+    syscalls = {}
+
+    with open('/usr/include/asm-generic/unistd.h', 'r') as f:
+        content = f.read()
+        matches = re.findall(syscall_regex, content)
+
+        for match in matches:
+            syscall_name = match[0].replace("_", "")
+            syscall_number = int(match[1])
+            syscalls[syscall_name] = syscall_number
+
+    with open('syscalls.json', 'w') as f:
+        json.dump(syscalls, f, indent=4)
+
+def replace_syscall_with_number(input_file, output_file):
+    json_file = 'syscalls.json'
+    
+    # load syscall numbers from JSON
+    with open(json_file, 'r') as f:
+        syscalls = json.load(f)
 
 
-
+    # Load syscall numbers from JSON
     with open(input_file, 'r') as input_file, open(output_file, 'w') as output_file:
         for line in input_file:
             syscall_name = line.strip()
-            if syscall_name[0] == '_':
-                    syscall_name = syscall_name[1:]
-
-            if syscall_name in syscall_dict_sys:                
-                syscall_number = syscall_dict_sys[syscall_name]
-                syscall_number = syscall_number.strip()
-                output_file.write(syscall_number + ' ')
-
-            elif syscall_name in syscall_dict_NR:
-                syscall_number = syscall_dict_NR[syscall_name]
-                syscall_number = syscall_number.strip()
-                output_file.write(syscall_number + ' ')
-
+            if syscall_name in syscalls:
+                syscall_number = syscalls[syscall_name]
+                print(syscall_name + ' -> ' + str(syscall_number))
+                output_file.write(str(syscall_number) + '\n')
             else:
-                print('Syscall name not found: ' + syscall_name)
-        
-        
+                print('Syscall not found: ' + syscall_name)
+                
+            
 
 
 # get_syscall_from_ssh()
 # get_syscall_from_Meterpreter()
+get_systemcall_from_your_computer()
 get_syscall_from_hydra_http()
