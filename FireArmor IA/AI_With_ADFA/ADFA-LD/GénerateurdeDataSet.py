@@ -64,6 +64,27 @@ def get_syscall_from_ssh():
 
         replace_syscall_with_number(syscall_names_file_base, csv_file, 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Hydra_SSH_11/UAD-Hydra-SSH-1-{i}.txt'.format(i=i))
 
+def get_syscall_from_hydra_http():
+    output_file = 'output.txt'
+    syscall_names_file_base = 'syscall_names.txt'
+    csv_file = 'FireArmor IA/AI_With_ADFA/ADFA-LD/label.csv'
+    
+
+    cmd1 = "strace -e trace=all -o {output_file} hydra -l {name} -P {wordList} {ip} http-post-form \"/:username=^USER^&password=^PASS^:F=incorrect\" -V".format(output_file=output_file, name='molly', wordList='/usr/share/wordlists/rockyou.txt', ip='10.10.69.36')
+    cmd2 = "awk -F '(' '{{print $1}}' {output_file} | awk -F ' ' '{{print $NF}}' > {syscall_names_file_base}".format(output_file=output_file, syscall_names_file_base=syscall_names_file_base)
+
+    # Exécutez la commande 1
+    process = subprocess.Popen(cmd1, shell=True)
+    process.wait()
+
+    # Exécutez la commande 2
+    process = subprocess.Popen(cmd2, shell=True)
+    process.wait()
+
+    replace_syscall_with_number(syscall_names_file_base, csv_file, 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Hydra_SSH_11/UAD-Hydra-SSH-1-0.txt')
+
+    
+
 
 def get_syscall_from_Meterpreter():
     # Dans un terminal load msgrpc [Pass=hugo]
@@ -223,5 +244,6 @@ def replace_syscall_with_number(input_file, csv_file, output_file):
         
 
 
-get_syscall_from_ssh()
+# get_syscall_from_ssh()
 # get_syscall_from_Meterpreter()
+get_syscall_from_hydra_http()
