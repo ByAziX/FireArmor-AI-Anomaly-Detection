@@ -69,16 +69,30 @@ def get_syscall_from_Meterpreter():
     # Dans un terminal load msgrpc [Pass=hugo]
 
 
-    client = MsfRpcClient('2GX4jkpm', port=55552)
+    client = MsfRpcClient('f6v3ltZ9', port=55552)
     payload_name = "linux/x86/meterpreter/reverse_tcp"
     csv_file = 'FireArmor IA/AI_With_ADFA/ADFA-LD/label.csv'
     payload_file = "meterpreterPayload"
-
     ip = get_my_ip()
-    print('your ip :', ip)
+   # Create a new console
+    console = client.consoles.console()
 
+    # Set up the listener
+    listener_options = {
+        'Payload': payload_name,
+        'LHOST': ip,
+        'LPORT': 55552
+    }
+    console.write('use exploit/multi/handler\n')
+    console.write(f'set {",".join(f"{k} {v}" for k, v in listener_options.items())}\n')
+    console.write('exploit -j\n')
+   
+    cmd4 = "strace -e trace=all -o output.txt ./{payload_file}; awk -F '(' '{{print $1}}' output.txt | awk -F ' ' '{{print $NF}}' > syscall_names.txt".format(payload_file=payload_file)
     
-    payload = client.modules.use('payload', payload_name)
+    # Exécuter la commande cmd4 dans un terminal
+    print("process2")
+    process = subprocess.Popen(cmd4, shell=True)
+
     
     replace_syscall_with_number('syscall_names.txt', csv_file, f'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Meterpreter_11/UAD-Meterpreter-11-0.txt')
     
@@ -209,5 +223,5 @@ def replace_syscall_with_number(input_file, csv_file, output_file):
         
 
 
-# get_syscall_from_ssh()
-get_syscall_from_Meterpreter()
+get_syscall_from_ssh()
+# get_syscall_from_Meterpreter()
