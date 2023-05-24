@@ -208,6 +208,7 @@ def get_syscall_from_Meterpreter():
 
 def get_systemcall_from_your_computer():
     syscall_regex = r'#define __NR(?:3264_)?(\w+)\s+(\d+)'
+    labelFile ='FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/syscalls.json'
 
     syscalls = {}
 
@@ -220,11 +221,11 @@ def get_systemcall_from_your_computer():
             syscall_number = int(match[1])
             syscalls[syscall_name] = syscall_number
 
-    with open('syscalls.json', 'w') as f:
+    with open(labelFile, 'w') as f:
         json.dump(syscalls, f, indent=4)
 
 def replace_syscall_with_number(input_file, output_file):
-    json_file = 'syscalls.json'
+    json_file = 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/syscalls.json'
     
     # load syscall numbers from JSON
     with open(json_file, 'r') as f:
@@ -237,13 +238,11 @@ def replace_syscall_with_number(input_file, output_file):
             syscall_name = line.strip()
             if syscall_name in syscalls:
                 syscall_number = syscalls[syscall_name]
-                print(syscall_name + ' -> ' + str(syscall_number))
-                output_file.write(str(syscall_number) + '\n')
+                output_file.write(str(syscall_number) + ' ')
             else:
                 print('Syscall not found: ' + syscall_name)
                 
             
-
 
 # get_syscall_from_ssh()
 # get_syscall_from_Meterpreter()
