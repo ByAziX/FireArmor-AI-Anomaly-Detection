@@ -124,14 +124,26 @@ def get_syscall_from_Meterpreter():
     cmd4 = "strace -e trace=all -o output.txt ./{payload} && awk -F '(' '{{print $1}}' output.txt | awk -F ' ' '{{print $NF}}' > syscall_names.txt".format(payload=payload)
 
     console1 = subprocess.Popen(['xterm', '-e', cmd1], shell=False)
+    time.sleep(10)
     console2 = subprocess.Popen(['xterm', '-e', cmd2], shell=False)
+    time.sleep(5)
 
     console3 = subprocess.Popen(['xterm', '-e', cmd3], shell=False)
     time.sleep(10)
 
     console4 = subprocess.Popen(['xterm', '-e', cmd4], shell=False)
-    time.sleep(60)  # Duration for capturing syscall data in seconds
-    console4.terminate()  # Stop the strace command
+    time.sleep(5)  # Duration for capturing syscall data in seconds
+        
+
+    console1.kill() 
+    console2.kill()
+    console3.kill()
+    console4.kill()
+
+
+
+
+
 
     replace_syscall_with_number(syscall_names_file_base, csv_file, 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Meterpreter_11/UAD-Meterpreter-11-0.txt')
 
