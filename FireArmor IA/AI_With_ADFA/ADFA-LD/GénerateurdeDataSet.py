@@ -190,7 +190,7 @@ if __name__ == "__main__":
     ssh_file = 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Hydra_SSH_11/'
     # get_syscall_from_ssh()
     # get_syscall_from_Meterpreter()
-    # get_systemcall_from_your_computer(json_file)
+    get_systemcall_from_your_computer(json_file)
     # get_syscall_from_hydra_http()
-    get_syscall_from_Meterpreter()
+    # get_syscall_from_Meterpreter()
     compare_and_delete_files(ssh_file)
