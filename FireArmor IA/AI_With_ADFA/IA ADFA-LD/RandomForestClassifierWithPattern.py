@@ -37,37 +37,9 @@ def get_X_y(df, attack_vector=None):
     if attack_vector is not None:
         traces = df["trace"].apply(lambda x: x.split())
         X = effectuer_transformation_attaque(traces, attack_vector)
-    else:
-        traces = df["trace"].apply(lambda x: list(map(int, x.split())))
-        X = transformer_donnees(traces)
-
-    y = np.array(df.iloc[:, 2:])
+        y = np.array(df.iloc[:, 2:])
     return X, y
 
-
-# Fonction pour effectuer la transformation des données pour le binaire d'attaque
-def transformer_donnees(traces):
-    # Initialiser une liste pour stocker les résultats
-    donnees_transformees = []
-
-    # Parcourir chaque trace dans les traces
-    for trace in traces:
-        # Créer une liste temporaire avec 340 zéros
-        temp_liste = [0] * 340
-
-        # Parcourir chaque élément dans la trace
-        for element in trace:
-            # Ignorer les éléments supérieurs à 340
-            if element > 340:
-                continue
-            # Incrémenter le compte à l'index correspondant de la liste temporaire
-            temp_liste[element - 1] += 1
-
-        # Ajouter la liste temporaire aux données transformées
-        donnees_transformees.append(temp_liste)
-
-    # Retourner les données transformées comme un tableau numpy
-    return np.array(donnees_transformees)
 
 
 # Transformation des données pour l'entrainement du classifieur d'attaque (Type d'attaque)
@@ -88,11 +60,11 @@ def effectuer_transformation_attaque(traces, vecteur_attaque):
                 sous_ensemble = trace[index: index+taille]
 
                 # Créer une clé en joignant les éléments du sous-ensemble avec un tiret
-                cle = "-".join(map(str, sous_ensemble))
+                pattern = "-".join(map(str, sous_ensemble))
 
                 # Si la clé est dans le vecteur d'attaque, augmenter le compte dans la matrice temporaire
-                if cle in vecteur_attaque:
-                    temp_matrice[vecteur_attaque[cle]] += 1
+                if pattern in vecteur_attaque:
+                    temp_matrice[vecteur_attaque[pattern]] += 1
 
         # Convertir la matrice temporaire en un tableau numpy et l'ajouter aux résultats
         temp_matrice = np.array(temp_matrice, dtype="float64")
@@ -124,16 +96,16 @@ def preparer_vecteur(traces):
                 sous_ensemble = trace[i: i+taille]
 
                 # Créer une clé en joignant les éléments du sous-ensemble avec un tiret
-                cle = "-".join(sous_ensemble)
+                pattern = "-".join(sous_ensemble)
 
-                # Si la clé est dans les caractéristiques et pas dans le vecteur d'attaque, ajouter la clé au vecteur d'attaque
-                if cle in caracteristiques:
-                    if cle not in vecteur_attaque:
-                        vecteur_attaque[cle] = index
+                # Si la clé est dans les caractéristiques et pas dans le vecteur d'attaque, ajouter la pattern au vecteur d'attaque
+                if pattern in caracteristiques:
+                    if pattern not in vecteur_attaque:
+                        vecteur_attaque[pattern] = index
                         index += 1
-                # Sinon, si la clé n'est pas dans les caractéristiques, ajouter la clé aux caractéristiques
+                # Sinon, si la clé n'est pas dans les caractéristiques, ajouter la pattern aux caractéristiques
                 else:
-                    caracteristiques.add(cle)
+                    caracteristiques.add(pattern)
 
     # Retourner le vecteur d'attaque
     return vecteur_attaque

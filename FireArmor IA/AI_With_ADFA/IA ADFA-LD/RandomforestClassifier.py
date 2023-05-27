@@ -88,11 +88,11 @@ def effectuer_transformation_attaque(traces, vecteur_attaque):
                 sous_ensemble = trace[index: index+taille]
 
                 # Créer une clé en joignant les éléments du sous-ensemble avec un tiret
-                cle = "-".join(map(str, sous_ensemble))
+                pattern = "-".join(map(str, sous_ensemble))
 
                 # Si la clé est dans le vecteur d'attaque, augmenter le compte dans la matrice temporaire
-                if cle in vecteur_attaque:
-                    temp_matrice[vecteur_attaque[cle]] += 1
+                if pattern in vecteur_attaque:
+                    temp_matrice[vecteur_attaque[pattern]] += 1
 
         # Convertir la matrice temporaire en un tableau numpy et l'ajouter aux résultats
         temp_matrice = np.array(temp_matrice, dtype="float64")
@@ -124,16 +124,16 @@ def preparer_vecteur(traces):
                 sous_ensemble = trace[i: i+taille]
 
                 # Créer une clé en joignant les éléments du sous-ensemble avec un tiret
-                cle = "-".join(sous_ensemble)
+                pattern = "-".join(sous_ensemble)
 
-                # Si la clé est dans les caractéristiques et pas dans le vecteur d'attaque, ajouter la clé au vecteur d'attaque
-                if cle in caracteristiques:
-                    if cle not in vecteur_attaque:
-                        vecteur_attaque[cle] = index
+                # Si la clé est dans les caractéristiques et pas dans le vecteur d'attaque, ajouter la pattern au vecteur d'attaque
+                if pattern in caracteristiques:
+                    if pattern not in vecteur_attaque:
+                        vecteur_attaque[pattern] = index
                         index += 1
-                # Sinon, si la clé n'est pas dans les caractéristiques, ajouter la clé aux caractéristiques
+                # Sinon, si la clé n'est pas dans les caractéristiques, ajouter la pattern aux caractéristiques
                 else:
-                    caracteristiques.add(cle)
+                    caracteristiques.add(pattern)
 
     # Retourner le vecteur d'attaque
     return vecteur_attaque
@@ -145,7 +145,7 @@ def train_binary(attack_data,train_data,validation_data):
     print("Entraînement du classifieur binaire en cours")
         
     X, y = get_X_y(train_data)
-    
+
     y = y.sum(axis=1)
     X_attack, y_attack = get_X_y(attack_data)
     X_val, y_val = get_X_y(validation_data)
