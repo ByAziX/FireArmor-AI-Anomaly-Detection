@@ -17,7 +17,7 @@ PREDICTIONS = {
 }
 
 
-binary_classifier = RandomForestClassifier(n_estimators=150, class_weight={0: 1.0, 1: 2.0})
+binary_classifier = RandomForestClassifier(n_estimators=150)
 attack_classifier = RandomForestClassifier(n_estimators=150)
 
 
@@ -97,7 +97,7 @@ def effectuer_transformation_attaque(traces, vecteur_attaque):
         # Convertir la matrice temporaire en un tableau numpy et l'ajouter aux résultats
         temp_matrice = np.array(temp_matrice, dtype="float64")
         resultats.append(temp_matrice)
-
+    
     # Retourner les résultats comme un tableau numpy
     return np.array(resultats)
 
@@ -139,27 +139,25 @@ def preparer_vecteur(traces):
     return vecteur_attaque
 
 # Detection d'une attaque ou non
-def train_binary(attack_data,train_data,validation_data):
+def train_binary(attack_data,train_data,validation_data,attack_vector,train_vector,validation_vector):
 
     print('-' * 60)
     print("Entraînement du classifieur binaire en cours")
-        
-    X, y = get_X_y(train_data)
     
+    X, y = get_X_y(train_data, train_vector)
     y = y.sum(axis=1)
-    X_attack, y_attack = get_X_y(attack_data)
-    X_val, y_val = get_X_y(validation_data)
+
+    
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
     binary_classifier.fit(X_train, y_train)
 
-    pred_val = binary_classifier.predict(X_val)
-    pred_a = binary_classifier.predict(X_attack)
+    # Précision du classifieur binaire
     y_pred = binary_classifier.predict(X_test)
+    print("\nPrécision du classifieur binaire :", accuracy_score(y_test, y_pred))
     
-    print("Précision globale du classifieur binaire sur les données de test :", accuracy_score(y_test, y_pred))
-    print("Précision du classifieur binaire sur les attaques uniquement :", accuracy_score([1 for _ in range(len(pred_a))], pred_a))
-    print("Précision du classifieur binaire sur la validation uniquement :", accuracy_score([0 for _ in range(len(pred_val))], pred_val))
+
     print('-' * 60)
 
 
@@ -168,7 +166,6 @@ def train_binary(attack_data,train_data,validation_data):
 def train_attack(attack_vector,attack_data):
 
     print("\nEntraînement de la détection d'attaque en cours")
-    traces = attack_data["trace"].apply(lambda x: x.split())
 
     X, y = get_X_y(attack_data,attack_vector)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
@@ -186,11 +183,11 @@ def train_attack(attack_vector,attack_data):
 
 # Prediction de la dection d'une attaque ou non et du type d'attaque
 
-def predict(trace, attack_vector, threshold=0.13):
+def predict(trace,train_vecteur, attack_vector, threshold=0.13):
     if isinstance(trace, str):
         trace = np.array([list(map(int, trace.split()))])
         
-    X_bin = transformer_donnees(trace)
+    X_bin = effectuer_transformation_attaque(trace, train_vecteur)
     bp = binary_classifier.predict_proba(X_bin)[:, 1]
     print("Binary prediction :", bp[0])
 
@@ -205,7 +202,7 @@ def predict(trace, attack_vector, threshold=0.13):
 
 # Test de l'IA avec des attaques
 
-def testIAWithSomeAttack():
+def testIAWithSomeAttack(train_vecteur, attack_vector):
     try:
         files = {}
         file_directory = "FireArmor IA/AI_With_ADFA/IA ADFA-LD/tests/"
@@ -216,7 +213,7 @@ def testIAWithSomeAttack():
             with open(filename) as fs:
                 trace = fs.read().strip()
             print("Fichier envoyé à l'IA : ", filename)
-            pred = PREDICTIONS.get(predict(trace,attack_vector), "-")
+            pred = PREDICTIONS.get(predict(trace,train_vecteur,attack_vector), "-")
             print("VERDICT:", pred)
             print('-' * 60)
 
@@ -248,15 +245,20 @@ if __name__ == "__main__":
 
     print('-' * 60)
     print("Training model")
-    traces = attack_data["trace"].apply(lambda x: x.split())
-    attack_vector = preparer_vecteur(traces)
-    train_binary(attack_data,train_data,validation_data)
+    traces_attack = attack_data["trace"].apply(lambda x: x.split())
+    traces_train = train_data["trace"].apply(lambda x: x.split())
+    traces_validation = validation_data["trace"].apply(lambda x: x.split())
+    attack_vector = preparer_vecteur(traces_attack)
+    train_vector = preparer_vecteur(traces_train)
+    validation_vector = preparer_vecteur(traces_validation)
+
+    train_binary(attack_data,train_data,validation_data,attack_vector,train_vector,validation_vector)
     train_attack(attack_vector,attack_data)
     print("Training complete")
 
     print('-' * 60)
     print("Testing model")
-    testIAWithSomeAttack()
+    testIAWithSomeAttack(train_vector, attack_vector)
     print("Testing complete")
     print('-' * 60)
 
