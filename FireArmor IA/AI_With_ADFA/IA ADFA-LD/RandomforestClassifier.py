@@ -3,6 +3,7 @@ from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.ensemble import RandomForestClassifier
 import pandas as pd
 import numpy as np
+import pickle
 
 import InputData 
 
@@ -20,6 +21,30 @@ PREDICTIONS = {
 binary_classifier = RandomForestClassifier(n_estimators=150, class_weight={0: 1.0, 1: 2.0})
 attack_classifier = RandomForestClassifier(n_estimators=150)
 
+def sauvegarder_modele(modele, fichier):
+    """
+    Sauvegarde le modèle binaire dans un fichier à l'aide de pickle.
+
+    Args:
+        modele (object): Le modèle binaire à sauvegarder.
+        fichier (str): Le nom du fichier de sauvegarde.
+    """
+    with open(fichier, "wb") as file:
+        pickle.dump(modele, file)
+
+def charger_modele(fichier):
+    """
+    Charge le modèle binaire à partir d'un fichier sauvegardé avec pickle.
+
+    Args:
+        fichier (str): Le nom du fichier contenant le modèle sauvegardé.
+
+    Returns:
+        object: Le modèle binaire chargé.
+    """
+    with open(fichier, "rb") as file:
+        modele = pickle.load(file)
+    return modele 
 
 
 def load_data(train_data_path, validation_data_path):
@@ -242,6 +267,8 @@ def getDataFromTetragon():
 if __name__ == "__main__":
     
     train_data_path = "train.csv"
+    DataSetFolder = "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/"
+
     # train_data_path = "FireArmor IA/AI_With_ADFA/IA ADFA-LD/train_data.csv"
     validation_data_path = "FireArmor IA/AI_With_ADFA/IA ADFA-LD/validation_data.csv"
     train_data, validation_data, attack_data = load_data(train_data_path, validation_data_path)
@@ -251,7 +278,9 @@ if __name__ == "__main__":
     traces = attack_data["trace"].apply(lambda x: x.split())
     attack_vector = preparer_vecteur(traces)
     train_binary(attack_data,train_data,validation_data)
+    sauvegarder_modele(binary_classifier, DataSetFolder+"binary_classifier.pkl")
     train_attack(attack_vector,attack_data)
+    sauvegarder_modele(attack_classifier, DataSetFolder+"attack_classifier.pkl")
     print("Training complete")
 
     print('-' * 60)
