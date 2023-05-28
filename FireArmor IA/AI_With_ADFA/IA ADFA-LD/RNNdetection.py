@@ -6,6 +6,7 @@ from tensorflow.keras.layers import Dense, LSTM
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from sklearn.preprocessing import OneHotEncoder
+import InputData
 
 PREDICTIONS = {
     0: "NO ATTACK",
@@ -120,7 +121,8 @@ model_prob = train_model_prob(model_prob, X_train, y_train, X_test, y_test, epoc
 model_class = train_model_class(model_class, X_train, y_train, X_test, y_test, epochs, batch_size)
 
 # Predict a trace
-trace = np.array([5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 141, 6, 120, 6, 221, 221, 66, 6, 6, 6, 5, 41, 41, 60, 97, 12, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 175, 26, 11, 45, 33, 192, 33, 5, 197, 192, 6, 33, 5, 3, 197, 192, 192, 192, 6, 192, 243, 125, 125, 125, 91, 20, 174, 201, 45, 45, 64, 183, 5, 221, 6, 221, 174, 174, 174, 174, 174, 174, 3, 195, 5, 221, 6, 221, 3, 3, 6, 11, 45, 33, 192, 33, 5, 197, 192, 6, 33, 5, 3, 197, 192, 192, 6, 33, 5, 3, 197, 192, 192, 6, 33, 5, 3, 197, 192, 192, 192, 192, 6, 33, 5, 3, 197, 192, 192, 6, 33, 5, 3, 197, 192, 192, 6, 33, 5, 3, 197, 192, 192, 192, 6, 192, 192, 243, 125, 125, 125, 125, 125, 125, 125, 125, 91, 258, 311, 240, 240, 174, 174, 175, 191, 122, 5, 221, 45, 45, 141, 5, 5, 5, 5, 78, 5, 5, 5, 5, 5, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91])
+trace = InputData.readCharsFromFile("FireArmor IA/AI_With_ADFA/IA ADFA-LD/tests/UAD-Hydra-FTP-1-9186.txt")
+
 is_anomaly, predicted_class_label, anomaly_prediction = predict_trace(model_prob, model_class, trace)
 
 print("Is Anomaly:", is_anomaly)
