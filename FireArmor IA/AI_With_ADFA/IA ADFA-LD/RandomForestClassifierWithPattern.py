@@ -149,7 +149,7 @@ def effectuer_transformation_attaque(traces, vecteur_attaque):
     resultats = []
 
     for trace in traces:
-        temp_matrice = [0]*len(vecteur_attaque) + [350]
+        temp_matrice = [0]*len(vecteur_attaque) # + [350]
 
         for taille in range(2, 6):
             for index in range(0, len(trace) - taille):
