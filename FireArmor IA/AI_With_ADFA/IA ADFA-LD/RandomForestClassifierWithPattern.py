@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import pickle
 from sklearn.model_selection import GridSearchCV
+import os
 
 
 import InputData 
@@ -58,6 +59,8 @@ def sauvegarder_modele(modele, fichier):
     """
     with open(fichier, "wb") as file:
         pickle.dump(modele, file)
+
+
 
 def charger_modele(fichier):
     """
@@ -199,7 +202,7 @@ def preparer_vecteur(traces):
 
     return vecteur_attaque
 
-def train_binary(attack_data,train_data,validation_data,attack_vector,train_vector,validation_vector):
+def train_binary(attack_data,train_data,validation_data,train_vector):
     """
     Fonction qui permet d'entrainer le classifieur binaire. Detection d'une attaque ou non
 
@@ -259,7 +262,7 @@ def train_attack(attack_vector,attack_data):
     print('-' * 60)
 
 
-def predict(trace,train_vecteur, attack_vector, threshold=0.45):
+def predict(trace,train_vecteur, attack_vector, threshold=0.5):
     """
     Fonction qui permet de prédire si une attaque est en cours ou non.
 
@@ -316,6 +319,39 @@ def testIAWithSomeAttack(train_vecteur, attack_vector):
         print(e)
         print()
     
+previous_syscalls = []
+
+def predict_trace_from_file(train_vector, attack_vector):
+    """
+    Fonction qui lit chaque numéro d'une trace à partir d'un fichier et le prédit avec l'IA,
+    en conservant en mémoire les systèmes d'appel précédents pour réaliser une trace complète.
+
+    Args:
+        train_vector (dict): Le vecteur d'entrainement.
+        attack_vector (dict): Le vecteur d'attaque.
+
+    Returns:
+        list: Les prédictions pour chaque système d'appel.
+    """
+    global previous_syscalls
+    file_path = "FireArmor IA/AI_With_ADFA/IA ADFA-LD/tests/UAD-Hydra-FTP-1-9186.txt"
+
+    with open(file_path) as file:
+        trace = file.read().strip().split()
+
+    predictions = []
+
+    for i, syscall in enumerate(trace):
+        if i > 0:
+            previous_syscalls.append(trace[i-1])  # Ajoute le système d'appel précédent à la liste des précédents
+
+        pred = PREDICTIONS.get(predict([previous_syscalls], train_vector, attack_vector), "-")
+        predictions.append(pred)
+
+
+    return predictions
+
+
 
 
 if __name__ == "__main__":
@@ -331,14 +367,27 @@ if __name__ == "__main__":
     traces_attack = attack_data["trace"].apply(lambda x: x.split())
     traces_train = train_data["trace"].apply(lambda x: x.split())
     traces_validation = validation_data["trace"].apply(lambda x: x.split())
-    attack_vector = preparer_vecteur(traces_attack)
-    train_vector = preparer_vecteur(traces_train)
-    validation_vector = preparer_vecteur(traces_validation)
 
-    train_binary(attack_data,train_data,validation_data,attack_vector,train_vector,validation_vector)
-    sauvegarder_modele(binary_classifier, DataSetFolder+"binary_classifier.pkl")
-    train_attack(attack_vector,attack_data)
-    sauvegarder_modele(attack_classifier, DataSetFolder+"attack_classifier.pkl")
+    
+
+    
+
+    if os.path.exists(DataSetFolder+"binary_classifier.pkl") and os.path.exists(DataSetFolder+"attack_classifier.pkl"):
+        attack_vector = charger_modele(DataSetFolder+"attack_vector.pkl")
+        train_vector = charger_modele(DataSetFolder+"train_vector.pkl")
+        binary_classifier = charger_modele(DataSetFolder+"binary_classifier.pkl")
+        attack_classifier = charger_modele(DataSetFolder+"attack_classifier.pkl")
+
+    else:
+        attack_vector = preparer_vecteur(traces_attack)
+        train_vector = preparer_vecteur(traces_train)
+        sauvegarder_modele(attack_vector, DataSetFolder+"attack_vector.pkl")
+        sauvegarder_modele(train_vector, DataSetFolder+"train_vector.pkl")
+
+        train_binary(attack_data,train_data,validation_data,train_vector)
+        sauvegarder_modele(binary_classifier, DataSetFolder+"binary_classifier.pkl")
+        train_attack(attack_vector,attack_data)
+        sauvegarder_modele(attack_classifier, DataSetFolder+"attack_classifier.pkl")
     print("Training complete")
 
     print('-' * 60)
@@ -346,3 +395,5 @@ if __name__ == "__main__":
     testIAWithSomeAttack(train_vector, attack_vector)
     print("Testing complete")
     print('-' * 60)
+    print("Predicting trace from file")
+    predict_trace_from_file(train_vector, attack_vector)
