@@ -23,7 +23,7 @@ ATTACK_TYPES = {
 }
 
 # Global hyper-parameters
-SEQUENCE_LENGTH = 100
+SEQUENCE_LENGTH = 300
 EPOCHS = 20
 BATCH_SIZE = 32
 
@@ -149,7 +149,7 @@ def main():
         save_model(model_class, os.path.join(DIRECTORY, MODEL_CLASS_PATH))
 
     # Predict a trace
-    trace = InputData.readCharsFromFile("FireArmor IA/AI_With_ADFA/IA ADFA-LD/tests/UAD-Hydra-SSH-1-2311.txt")
+    trace = InputData.readCharsFromFile("FireArmor IA/AI_With_ADFA/IA ADFA-LD/tests/hydra_test_1.txt")
 
     predicted_class_label, attack_type_label, anomaly_prediction = predict_trace(model_prob, model_class, trace)
 
