@@ -396,5 +396,5 @@ if __name__ == "__main__":
     testIAWithSomeAttack(train_vector, attack_vector)
     print("Testing complete")
     print('-' * 60)
-    print("Predicting trace from file")
+    print("Predicting trace from system call file")
     predict_trace_from_file(train_vector, attack_vector)
