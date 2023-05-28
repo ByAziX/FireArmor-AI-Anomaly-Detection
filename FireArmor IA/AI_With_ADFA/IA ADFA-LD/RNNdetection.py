@@ -13,6 +13,15 @@ PREDICTIONS = {
     1: "ATTACK"
 }
 
+ATTACK_TYPES = {
+    0: "Adduser",
+    1: "Hydra_FTP",
+    2: "Hydra_SSH",
+    3: "Java_Meterpreter",
+    4: "Meterpreter",
+    5: "Web_Shell"
+}
+
 # Global hyper-parameters
 sequence_length = 100
 random_data_dup = 10  # each sample randomly duplicated between 0 and 9 times, see dropin function
@@ -102,7 +111,14 @@ def predict_trace(model_prob, model_class, trace):
     predicted_class_index = 1 if class_prediction >= 0.5 else 0
     predicted_class_label = PREDICTIONS[predicted_class_index]
 
-    return is_anomaly, predicted_class_label, anomaly_prediction
+    # Get the attack type
+    if predicted_class_index == 1:
+        attack_type_prediction = np.argmax(model_class.predict(trace), axis=1)[0]
+        attack_type_label = ATTACK_TYPES[attack_type_prediction]
+    else:
+        attack_type_label = "N/A"
+
+    return is_anomaly, predicted_class_label, attack_type_label, anomaly_prediction
 
 # Define the path to the trace data file
 file_path = 'train.csv'
@@ -123,8 +139,9 @@ model_class = train_model_class(model_class, X_train, y_train, X_test, y_test, e
 # Predict a trace
 trace = InputData.readCharsFromFile("FireArmor IA/AI_With_ADFA/IA ADFA-LD/tests/UAD-Hydra-FTP-1-9186.txt")
 
-is_anomaly, predicted_class_label, anomaly_prediction = predict_trace(model_prob, model_class, trace)
+is_anomaly, predicted_class_label, attack_type_label, anomaly_prediction = predict_trace(model_prob, model_class, trace)
 
 print("Is Anomaly:", is_anomaly)
 print("Attack Type:", predicted_class_label)
+print("Attack Subtype:", attack_type_label)
 print("Anomaly Probability:", anomaly_prediction)
