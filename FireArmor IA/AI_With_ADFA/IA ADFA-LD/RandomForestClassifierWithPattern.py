@@ -342,12 +342,11 @@ def predict_trace_from_file(train_vector, attack_vector):
     predictions = []
 
     for i, syscall in enumerate(trace):
-        if i > 0:
-            previous_syscalls.append(trace[i-1])  # Ajoute le système d'appel précédent à la liste des précédents
-
-        pred = PREDICTIONS.get(predict([previous_syscalls], train_vector, attack_vector), "-")
-        print(f"Prediction : {pred}")
-        predictions.append(pred)
+        previous_syscalls.append(trace[i-1])  # Ajoute le système d'appel précédent à la liste des précédents
+        if i > 0: 
+            pred = PREDICTIONS.get(predict([previous_syscalls], train_vector, attack_vector), "-")
+            print(f"Prediction : {pred}")
+            predictions.append(pred)
 
 
     return predictions
