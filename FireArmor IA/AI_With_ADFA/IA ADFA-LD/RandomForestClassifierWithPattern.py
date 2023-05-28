@@ -334,7 +334,7 @@ def predict_trace_from_file(train_vector, attack_vector):
         list: Les prédictions pour chaque système d'appel.
     """
     global previous_syscalls
-    file_path = "FireArmor IA/AI_With_ADFA/IA ADFA-LD/tests/UAD-Hydra-FTP-1-9186.txt"
+    file_path = "FireArmor IA/AI_With_ADFA/IA ADFA-LD/tests/no_attack_and_attack.txt"
 
     with open(file_path) as file:
         trace = file.read().strip().split()
@@ -347,6 +347,12 @@ def predict_trace_from_file(train_vector, attack_vector):
             pred = PREDICTIONS.get(predict([previous_syscalls], train_vector, attack_vector), "-")
             print(f"Prediction : {pred}")
             predictions.append(pred)
+        
+        # tout les 10 on reset la liste des précédents
+        #if i % 20 == 0:
+            # on garde les 20 derniers
+            # previous_syscalls = previous_syscalls[-10:]
+
 
 
     return predictions
