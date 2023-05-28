@@ -259,7 +259,7 @@ def train_attack(attack_vector,attack_data):
     print('-' * 60)
 
 
-def predict(trace,train_vecteur, attack_vector, threshold=0.13):
+def predict(trace,train_vecteur, attack_vector, threshold=0.45):
     """
     Fonction qui permet de prédire si une attaque est en cours ou non.
 
