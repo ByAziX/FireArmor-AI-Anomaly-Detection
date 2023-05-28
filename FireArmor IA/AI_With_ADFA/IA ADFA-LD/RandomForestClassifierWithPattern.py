@@ -199,10 +199,10 @@ def preparer_vecteur(traces):
 
     return vecteur_attaque
 
-# Detection d'une attaque ou non
 def train_binary(attack_data,train_data,validation_data,attack_vector,train_vector,validation_vector):
     """
-    Fonction qui permet d'entrainer le classifieur binaire.
+    Fonction qui permet d'entrainer le classifieur binaire. Detection d'une attaque ou non
+
 
     Args:
 
