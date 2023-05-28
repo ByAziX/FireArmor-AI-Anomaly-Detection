@@ -106,7 +106,7 @@ def predict_trace(model_prob, model_class, trace):
     predicted_class_index = np.argmax(class_prediction)
     predicted_class_label = PREDICTIONS[predicted_class_index] 
 
-    return is_anomaly, predicted_class_label
+    return is_anomaly, predicted_class_label,anomaly_prediction
 
 # Define the path to the trace data file
 file_path = 'train.csv'
@@ -126,7 +126,8 @@ model_class = train_model_class(model_class, X_train, y_train[:, 1:], X_test, y_
 
 # Predict a trace
 trace = np.array([5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 141, 6, 120, 6, 221, 221, 66, 6, 6, 6, 5, 41, 41, 60, 97, 12, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 175, 26, 11, 45, 33, 192, 33, 5, 197, 192, 6, 33, 5, 3, 197, 192, 192, 192, 6, 192, 243, 125, 125, 125, 91, 20, 174, 201, 45, 45, 64, 183, 5, 221, 6, 221, 174, 174, 174, 174, 174, 174, 3, 195, 5, 221, 6, 221, 3, 3, 6, 11, 45, 33, 192, 33, 5, 197, 192, 6, 33, 5, 3, 197, 192, 192, 6, 33, 5, 3, 197, 192, 192, 6, 33, 5, 3, 197, 192, 192, 192, 192, 6, 33, 5, 3, 197, 192, 192, 6, 33, 5, 3, 197, 192, 192, 6, 33, 5, 3, 197, 192, 192, 192, 6, 192, 192, 243, 125, 125, 125, 125, 125, 125, 125, 125, 91, 258, 311, 240, 240, 174, 174, 175, 191, 122, 5, 221, 45, 45, 141, 5, 5, 5, 5, 78, 5, 5, 5, 5, 5, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91, 5, 197, 192, 3, 6, 91])
-is_anomaly, predicted_class_label = predict_trace(model_prob, model_class, trace)
+is_anomaly, predicted_class_label,anomaly_prediction = predict_trace(model_prob, model_class, trace)
 
 print("Is Anomaly:", is_anomaly)
 print("Attack Type:", predicted_class_label)
+print("Anomaly Probability:", anomaly_prediction)
