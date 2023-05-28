@@ -106,10 +106,8 @@ def predict_trace(model_prob, model_class, trace):
     predicted_class_index = 1 if anomaly_prediction >= 0.5 else 0
     predicted_class_label = PREDICTIONS[predicted_class_index]
 
-    # Get the attack type    
-    
-    class_prediction = model_class.predict(trace)
-    if predicted_class_index == 1:
+    # Get the attack type
+    if predicted_class_label == "ATTACK":
         attack_type_prediction = np.argmax(model_class.predict(trace), axis=1)[0]
         attack_type_label = ATTACK_TYPES[attack_type_prediction]
     else:
@@ -117,18 +115,24 @@ def predict_trace(model_prob, model_class, trace):
 
     return predicted_class_label, attack_type_label, anomaly_prediction
 
-
 if __name__ == "__main__":
     model_prob_path = "model_prob.h5"
     model_class_path = "model_class.h5"
     directory = "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/"
 
+   
     # Check if the model files exist
     if os.path.exists(directory+model_prob_path) and os.path.exists(directory+model_class_path):
         # Load the models
         model_prob = load_model(directory+model_prob_path)
         model_class = load_model(directory+model_class_path)
     else:
+        # Delete the old model files if they exist
+        if os.path.exists(model_prob_path):
+            os.remove(model_prob_path)
+        if os.path.exists(directory+model_class_path):
+            os.remove(directory+model_class_path)
+
         # Preprocess the data
         file_path = 'train.csv'
         X_train, X_test, y_train, y_test = preprocess_data(file_path)
@@ -148,7 +152,7 @@ if __name__ == "__main__":
         save_model(model_class, directory+model_class_path)
 
     # Predict a trace
-    trace = InputData.readCharsFromFile("FireArmor IA/AI_With_ADFA/IA ADFA-LD/tests/no_attack_and_attack.txt")
+    trace = InputData.readCharsFromFile("FireArmor IA/AI_With_ADFA/IA ADFA-LD/tests/UAD-Hydra-SSH-1-2311.txt")
 
     predicted_class_label, attack_type_label, anomaly_prediction = predict_trace(model_prob, model_class, trace)
 
