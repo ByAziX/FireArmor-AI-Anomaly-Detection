@@ -7,6 +7,7 @@ from sklearn.model_selection import train_test_split
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from sklearn.preprocessing import OneHotEncoder
 import InputData
+import os
 
 PREDICTIONS = {
     0: "NO ATTACK",
@@ -24,19 +25,18 @@ ATTACK_TYPES = {
 
 # Global hyper-parameters
 sequence_length = 100
-random_data_dup = 10  # each sample randomly duplicated between 0 and 9 times, see dropin function
-epochs = 10
+epochs = 20
 batch_size = 32
 
-def dropin(X, y):
-    """ Function to augment data by randomly duplicating samples """
-    X_hat = []
-    y_hat = []
-    for i in range(len(X)):
-        for j in range(np.random.randint(0, random_data_dup)):
-            X_hat.append(X[i, :])
-            y_hat.append(y[i])
-    return np.asarray(X_hat), np.asarray(y_hat)
+def save_model(model, model_name):
+    """ Save the trained model """
+    model.save(model_name)
+
+def load_model(model_name):
+    """ Load the trained model """
+    model = tf.keras.models.load_model(model_name)
+    return model
+
 
 def preprocess_data(file_path):
     """ Preprocess the trace data """
@@ -101,47 +101,57 @@ def predict_trace(model_prob, model_class, trace):
 
     # Make anomaly prediction
     anomaly_prediction = model_prob.predict(trace)
-    if anomaly_prediction >= 0.5:
-        is_anomaly = True
-    else:
-        is_anomaly = False
 
     # Make attack classification prediction
-    class_prediction = model_class.predict(trace)
-    predicted_class_index = 1 if class_prediction >= 0.5 else 0
+    predicted_class_index = 1 if anomaly_prediction >= 0.5 else 0
     predicted_class_label = PREDICTIONS[predicted_class_index]
 
-    # Get the attack type
+    # Get the attack type    
+    
+    class_prediction = model_class.predict(trace)
     if predicted_class_index == 1:
         attack_type_prediction = np.argmax(model_class.predict(trace), axis=1)[0]
         attack_type_label = ATTACK_TYPES[attack_type_prediction]
     else:
         attack_type_label = "N/A"
 
-    return is_anomaly, predicted_class_label, attack_type_label, anomaly_prediction
+    return predicted_class_label, attack_type_label, anomaly_prediction
 
-# Define the path to the trace data file
-file_path = 'train.csv'
 
-# Preprocess the data
-X_train, X_test, y_train, y_test = preprocess_data(file_path)
+if __name__ == "__main__":
+    model_prob_path = "model_prob.h5"
+    model_class_path = "model_class.h5"
+    directory = "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/"
 
-# Create the LSTM models
-input_shape = (X_train.shape[1], 1)
-num_classes = 1
-model_prob = build_model_prob(input_shape)
-model_class = build_model_class(input_shape, num_classes)
+    # Check if the model files exist
+    if os.path.exists(directory+model_prob_path) and os.path.exists(directory+model_class_path):
+        # Load the models
+        model_prob = load_model(directory+model_prob_path)
+        model_class = load_model(directory+model_class_path)
+    else:
+        # Preprocess the data
+        file_path = 'train.csv'
+        X_train, X_test, y_train, y_test = preprocess_data(file_path)
 
-# Train the models
-model_prob = train_model_prob(model_prob, X_train, y_train, X_test, y_test, epochs, batch_size)
-model_class = train_model_class(model_class, X_train, y_train, X_test, y_test, epochs, batch_size)
+        # Create the LSTM models
+        input_shape = (X_train.shape[1], 1)
+        num_classes = 1
+        model_prob = build_model_prob(input_shape)
+        model_class = build_model_class(input_shape, num_classes)
 
-# Predict a trace
-trace = InputData.readCharsFromFile("FireArmor IA/AI_With_ADFA/IA ADFA-LD/tests/UAD-Hydra-FTP-1-9186.txt")
+        # Train the models
+        model_prob = train_model_prob(model_prob, X_train, y_train, X_test, y_test, epochs, batch_size)
+        model_class = train_model_class(model_class, X_train, y_train, X_test, y_test, epochs, batch_size)
 
-is_anomaly, predicted_class_label, attack_type_label, anomaly_prediction = predict_trace(model_prob, model_class, trace)
+        # Save the models
+        save_model(model_prob, directory+model_prob_path)
+        save_model(model_class, directory+model_class_path)
 
-print("Is Anomaly:", is_anomaly)
-print("Attack Type:", predicted_class_label)
-print("Attack Subtype:", attack_type_label)
-print("Anomaly Probability:", anomaly_prediction)
+    # Predict a trace
+    trace = InputData.readCharsFromFile("FireArmor IA/AI_With_ADFA/IA ADFA-LD/tests/no_attack_and_attack.txt")
+
+    predicted_class_label, attack_type_label, anomaly_prediction = predict_trace(model_prob, model_class, trace)
+
+    print("Attack Type:", predicted_class_label)
+    print("Attack Subtype:", attack_type_label)
+    print("Anomaly Probability:", anomaly_prediction)
