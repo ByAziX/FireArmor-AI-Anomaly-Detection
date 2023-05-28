@@ -4,6 +4,8 @@ from sklearn.ensemble import RandomForestClassifier
 import pandas as pd
 import numpy as np
 import pickle
+from sklearn.model_selection import GridSearchCV
+
 
 import InputData 
 
@@ -19,8 +21,32 @@ PREDICTIONS = {
 }
 
 
-binary_classifier = RandomForestClassifier(n_estimators=150)
-attack_classifier = RandomForestClassifier(n_estimators=150)
+param_grid = {
+    'n_estimators': [100, 200, 300, 400, 500],
+    'max_depth': [None, 10, 20, 30, 40, 50],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 2, 4],
+    'max_features': ['sqrt']
+}
+
+
+
+binary_classifier = RandomForestClassifier(
+    n_estimators=500,
+    max_depth=None,
+    min_samples_split=2,
+    min_samples_leaf=1,
+    max_features='sqrt',
+    n_jobs=-1  # Utiliser tous les processeurs disponibles
+)
+attack_classifier = RandomForestClassifier(
+    n_estimators=500,
+    max_depth=None,
+    min_samples_split=2,
+    min_samples_leaf=1,
+    max_features='sqrt',
+    n_jobs=-1  # Utiliser tous les processeurs disponibles
+)
 
 def sauvegarder_modele(modele, fichier):
     """
@@ -47,8 +73,37 @@ def charger_modele(fichier):
         modele = pickle.load(file)
     return modele 
 
+def testGridSearch(X_train, y_train):
+    """
+    Fonction qui permet de tester la fonction GridSearchCV de sklearn
+
+    Args:
+        X_train (numpy.ndarray): Les données d'entrainement.
+        y_train (numpy.ndarray): Les labels d'entrainement.
+    """
+    
+    global binary_classifier, param_grid
+    # Utilisation de GridSearchCV pour trouver les meilleurs paramètres
+    grid_search = GridSearchCV(estimator=binary_classifier, param_grid=param_grid, cv=3, n_jobs=-1, verbose=2)
+    grid_search.fit(X_train, y_train)
+
+    # Afficher les meilleurs paramètres
+    print("Meilleurs paramètres pour le classifieur binaire :", grid_search.best_params_)
+
+
 
 def load_data(train_data_path, validation_data_path):
+    """
+    Fonction qui permet de charger les données d'entrainement et de validation.
+
+    Args:
+        train_data_path (str): Le chemin vers le fichier contenant les données d'entrainement.
+        validation_data_path (str): Le chemin vers le fichier contenant les données de validation.
+
+    Returns:
+        tuple: Un tuple contenant les données d'entrainement, de validation et les données d'attaque.
+    """
+
     try:
         train_data = pd.read_csv(train_data_path)
         validation_data = pd.read_csv(validation_data_path)
@@ -59,6 +114,16 @@ def load_data(train_data_path, validation_data_path):
     return train_data, validation_data, attack_data
 
 def get_X_y(df, attack_vector=None):
+    """
+    Fonction qui permet de transformer les données en un format utilisable par le classifieur.
+
+    Args:
+        df (pandas.DataFrame): Le dataframe contenant les données.
+        attack_vector (dict, optional): Le vecteur d'attaque. Defaults to None.
+
+    Returns:
+        tuple: Un tuple contenant les données d'entrée et les labels.
+    """
 
     if attack_vector is not None:
         traces = df["trace"].apply(lambda x: x.split())
@@ -68,77 +133,87 @@ def get_X_y(df, attack_vector=None):
 
 
 
-# Transformation des données pour l'entrainement du classifieur d'attaque (Type d'attaque)
 def effectuer_transformation_attaque(traces, vecteur_attaque):
-    # Initialiser une liste pour stocker les résultats
+    """
+    Fonction qui permet de transformer les données en un format utilisable par le classifieur d'attaque.
+
+    Args:
+        traces (pandas.Series): Les traces à transformer.
+        vecteur_attaque (dict): Le vecteur d'attaque.
+
+    Returns:
+        numpy.ndarray: Les données transformées.
+
+    """
+
     resultats = []
 
-    # Parcourir chaque trace dans les traces
     for trace in traces:
-        # Créer une matrice temporaire avec des zéros de la taille du vecteur d'attaque et ajouter 350 à la fin
         temp_matrice = [0]*len(vecteur_attaque) + [350]
 
-        # Parcourir une plage de tailles de 2 à 5
         for taille in range(2, 6):
-            # Parcourir la trace actuelle avec la taille actuelle
             for index in range(0, len(trace) - taille):
-                # Créer un sous-ensemble de la trace
                 sous_ensemble = trace[index: index+taille]
 
-                # Créer une clé en joignant les éléments du sous-ensemble avec un tiret
                 pattern = "-".join(map(str, sous_ensemble))
 
-                # Si la clé est dans le vecteur d'attaque, augmenter le compte dans la matrice temporaire
                 if pattern in vecteur_attaque:
                     temp_matrice[vecteur_attaque[pattern]] += 1
 
-        # Convertir la matrice temporaire en un tableau numpy et l'ajouter aux résultats
         temp_matrice = np.array(temp_matrice, dtype="float64")
         resultats.append(temp_matrice)
     
-    # Retourner les résultats comme un tableau numpy
     return np.array(resultats)
 
 
-# Préparation du vecteur d'attaque pour l'entrainement du classifieur d'attaque (Type d'attaque)
 
 def preparer_vecteur(traces):
-    # Initialiser un dictionnaire pour stocker les vecteurs d'attaque
+    """
+    Fonction qui permet de préparer le vecteur d'attaque.
+
+    Args:
+        traces (pandas.Series): Les traces à transformer.
+
+    Returns:
+        dict: Le vecteur d'attaque.
+    """
     vecteur_attaque = {}
 
-    # Initialiser un ensemble pour stocker les caractéristiques uniques
     caracteristiques = set()
 
-    # Initialiser un index pour suivre l'index actuel dans le vecteur d'attaque
     index = 0
 
-    # Parcourir chaque trace dans les traces
     for trace in traces:
-        # Parcourir une plage de tailles de 2 à 5
         for taille in range(2, 6):
-            # Parcourir la trace actuelle avec la taille actuelle
             for i in range(0, len(trace) - taille):
-                # Créer un sous-ensemble de la trace
                 sous_ensemble = trace[i: i+taille]
 
-                # Créer une clé en joignant les éléments du sous-ensemble avec un tiret
                 pattern = "-".join(sous_ensemble)
 
-                # Si la clé est dans les caractéristiques et pas dans le vecteur d'attaque, ajouter la pattern au vecteur d'attaque
                 if pattern in caracteristiques:
                     if pattern not in vecteur_attaque:
                         vecteur_attaque[pattern] = index
                         index += 1
-                # Sinon, si la clé n'est pas dans les caractéristiques, ajouter la pattern aux caractéristiques
                 else:
                     caracteristiques.add(pattern)
 
-    # Retourner le vecteur d'attaque
     return vecteur_attaque
 
 # Detection d'une attaque ou non
 def train_binary(attack_data,train_data,validation_data,attack_vector,train_vector,validation_vector):
+    """
+    Fonction qui permet d'entrainer le classifieur binaire.
 
+    Args:
+
+        attack_data (pandas.DataFrame): Les données d'attaque.
+        train_data (pandas.DataFrame): Les données d'entrainement.
+        validation_data (pandas.DataFrame): Les données de validation.
+        attack_vector (dict): Le vecteur d'attaque.
+        train_vector (dict): Le vecteur d'entrainement.
+        validation_vector (dict): Le vecteur de validation.
+    """
+    global binary_classifier
     print('-' * 60)
     print("Entraînement du classifieur binaire en cours")
     
@@ -149,7 +224,6 @@ def train_binary(attack_data,train_data,validation_data,attack_vector,train_vect
 
     binary_classifier.fit(X_train, y_train)
 
-    # Précision du classifieur binaire
     y_pred = binary_classifier.predict(X_test)
     print("\nPrécision du classifieur binaire :", accuracy_score(y_test, y_pred))
     
@@ -157,9 +231,16 @@ def train_binary(attack_data,train_data,validation_data,attack_vector,train_vect
     print('-' * 60)
 
 
-# Detection du type d'attaque
 
 def train_attack(attack_vector,attack_data):
+    """
+    Fonction qui permet d'entrainer le classifieur d'attaque.
+
+    Args:
+        attack_vector (dict): Le vecteur d'attaque.
+        attack_data (pandas.DataFrame): Les données d'attaque.
+    """
+
 
     print("\nEntraînement de la détection d'attaque en cours")
 
@@ -177,9 +258,20 @@ def train_attack(attack_vector,attack_data):
 
     print('-' * 60)
 
-# Prediction de la dection d'une attaque ou non et du type d'attaque
 
 def predict(trace,train_vecteur, attack_vector, threshold=0.13):
+    """
+    Fonction qui permet de prédire si une attaque est en cours ou non.
+
+    Args:
+        trace (str): La trace à prédire.
+        train_vecteur (dict): Le vecteur d'entrainement.
+        attack_vector (dict): Le vecteur d'attaque.
+        threshold (float, optional): Le seuil de prédiction. Defaults to 0.13.
+
+    Returns:
+        int: Le type d'attaque.
+    """
     if isinstance(trace, str):
         trace = np.array([list(map(int, trace.split()))])
         
@@ -196,9 +288,16 @@ def predict(trace,train_vecteur, attack_vector, threshold=0.13):
         attack_predict = attack_classifier.predict(X_atk) + 1
         return attack_predict[0]
 
-# Test de l'IA avec des attaques
 
 def testIAWithSomeAttack(train_vecteur, attack_vector):
+    """
+    Fonction qui permet de tester l'IA avec des attaques.
+
+    Args:
+        train_vecteur (dict): Le vecteur d'entrainement.
+        attack_vector (dict): Le vecteur d'attaque.
+    """
+
     try:
         files = {}
         file_directory = "FireArmor IA/AI_With_ADFA/IA ADFA-LD/tests/"
@@ -217,19 +316,6 @@ def testIAWithSomeAttack(train_vecteur, attack_vector):
         print(e)
         print()
     
-def getDataFromTetragon():
-    try:
-        print(f"Loading ...")
-        with open("FireArmor IA/AI_With_ADFA/IA ADFA-LD/tests/attack.txt") as fs:
-            trace = fs.read().strip()
-        print("Fichier envoyé à l'IA : ", "attack.txt")
-        pred = PREDICTIONS.get(predict(trace,attack_vector), "-")
-        print("VERDICT:", pred)
-        print('-' * 60)
-    except:
-        print("Error")
-        print()
-    return 0
 
 
 if __name__ == "__main__":
@@ -260,4 +346,3 @@ if __name__ == "__main__":
     testIAWithSomeAttack(train_vector, attack_vector)
     print("Testing complete")
     print('-' * 60)
-

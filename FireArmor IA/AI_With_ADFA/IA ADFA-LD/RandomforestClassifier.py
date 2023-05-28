@@ -4,6 +4,8 @@ from sklearn.ensemble import RandomForestClassifier
 import pandas as pd
 import numpy as np
 import pickle
+from sklearn.model_selection import GridSearchCV
+
 
 import InputData 
 
@@ -17,9 +19,30 @@ PREDICTIONS = {
     6: "WEB_SHELL"
 }
 
+param_grid = {
+    'n_estimators': [100, 200, 300, 400, 500],
+    'max_depth': [None, 10, 20, 30, 40, 50],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 2, 4],
+    'max_features': ['sqrt']
+}
 
-binary_classifier = RandomForestClassifier(n_estimators=150, class_weight={0: 1.0, 1: 2.0})
-attack_classifier = RandomForestClassifier(n_estimators=150)
+
+
+
+binary_classifier = RandomForestClassifier(
+    n_estimators=500,
+    max_depth=None,
+    min_samples_split=2,
+    min_samples_leaf=1,
+    max_features='sqrt',
+    n_jobs=-1,
+    class_weight={0: 1.0, 1: 2.0}
+)
+
+attack_classifier = RandomForestClassifier(
+    n_estimators=500
+)
 
 def sauvegarder_modele(modele, fichier):
     """
@@ -46,8 +69,39 @@ def charger_modele(fichier):
         modele = pickle.load(file)
     return modele 
 
+def testGridSearch(X_train, y_train):
+    """
+    Effectue une recherche des meilleurs paramètres pour le classifieur binaire.
+
+    Args:
+        X_train (numpy.ndarray): Les données d'entrainement.
+        y_train (numpy.ndarray): Les étiquettes d'entrainement.
+
+    Returns:
+        object: Le classifieur binaire avec les meilleurs paramètres.
+    """
+    global attack_classifier, param_grid
+    # Utilisation de GridSearchCV pour trouver les meilleurs paramètres
+    grid_search = GridSearchCV(estimator=attack_classifier, param_grid=param_grid, cv=3, n_jobs=-1, verbose=2)
+    grid_search.fit(X_train, y_train)
+
+    # Afficher les meilleurs paramètres
+    print("Meilleurs paramètres pour le classifieur binaire :", grid_search.best_params_)
+
+
+
 
 def load_data(train_data_path, validation_data_path):
+    """
+    Charge les données d'entrainement et de validation à partir des fichiers csv.
+
+    Args:
+        train_data_path (str): Le chemin vers le fichier csv contenant les données d'entrainement.
+        validation_data_path (str): Le chemin vers le fichier csv contenant les données de validation.
+
+    Returns:
+        pandas.DataFrame, pandas.DataFrame, pandas.DataFrame: Les données d'entrainement, les données de validation et les données d'attaque.
+    """
     try:
         train_data = pd.read_csv(train_data_path)
         validation_data = pd.read_csv(validation_data_path)
@@ -58,6 +112,16 @@ def load_data(train_data_path, validation_data_path):
     return train_data, validation_data, attack_data
 
 def get_X_y(df, attack_vector=None):
+    """
+    Récupère les données et les étiquettes à partir d'un dataframe.
+
+    Args:
+        df (pandas.DataFrame): Le dataframe contenant les données.
+        attack_vector (list, optional): Le vecteur d'attaque. Defaults to None.
+
+    Returns:
+        numpy.ndarray, numpy.ndarray: Les données et les étiquettes.
+    """
 
     if attack_vector is not None:
         traces = df["trace"].apply(lambda x: x.split())
@@ -70,101 +134,109 @@ def get_X_y(df, attack_vector=None):
     return X, y
 
 
-# Fonction pour effectuer la transformation des données pour le binaire d'attaque
 def transformer_donnees(traces):
-    # Initialiser une liste pour stocker les résultats
+    """
+    Transforme les données en un tableau numpy.
+
+    Args:
+        traces (list): La liste des traces.
+
+    Returns:
+        numpy.ndarray: Les données transformées.
+
+    """
     donnees_transformees = []
 
-    # Parcourir chaque trace dans les traces
     for trace in traces:
-        # Créer une liste temporaire avec 340 zéros
         temp_liste = [0] * 340
 
-        # Parcourir chaque élément dans la trace
         for element in trace:
-            # Ignorer les éléments supérieurs à 340
             if element > 340:
                 continue
-            # Incrémenter le compte à l'index correspondant de la liste temporaire
             temp_liste[element - 1] += 1
 
-        # Ajouter la liste temporaire aux données transformées
         donnees_transformees.append(temp_liste)
 
-    # Retourner les données transformées comme un tableau numpy
     return np.array(donnees_transformees)
 
 
-# Transformation des données pour l'entrainement du classifieur d'attaque (Type d'attaque)
 def effectuer_transformation_attaque(traces, vecteur_attaque):
-    # Initialiser une liste pour stocker les résultats
+    """
+    Transforme les données en un tableau numpy.
+    Transformation des données pour l'entrainement du classifieur d'attaque (Type d'attaque)
+
+
+    Args:
+        traces (list): La liste des traces.
+        vecteur_attaque (list): Le vecteur d'attaque.
+
+    Returns:
+        numpy.ndarray: Les données transformées.
+    """
     resultats = []
 
-    # Parcourir chaque trace dans les traces
     for trace in traces:
-        # Créer une matrice temporaire avec des zéros de la taille du vecteur d'attaque et ajouter 350 à la fin
         temp_matrice = [0]*len(vecteur_attaque) + [350]
 
-        # Parcourir une plage de tailles de 2 à 5
         for taille in range(2, 6):
-            # Parcourir la trace actuelle avec la taille actuelle
             for index in range(0, len(trace) - taille):
-                # Créer un sous-ensemble de la trace
                 sous_ensemble = trace[index: index+taille]
 
-                # Créer une clé en joignant les éléments du sous-ensemble avec un tiret
                 pattern = "-".join(map(str, sous_ensemble))
 
-                # Si la clé est dans le vecteur d'attaque, augmenter le compte dans la matrice temporaire
                 if pattern in vecteur_attaque:
                     temp_matrice[vecteur_attaque[pattern]] += 1
 
-        # Convertir la matrice temporaire en un tableau numpy et l'ajouter aux résultats
         temp_matrice = np.array(temp_matrice, dtype="float64")
         resultats.append(temp_matrice)
 
-    # Retourner les résultats comme un tableau numpy
     return np.array(resultats)
 
 
-# Préparation du vecteur d'attaque pour l'entrainement du classifieur d'attaque (Type d'attaque)
 
 def preparer_vecteur(traces):
-    # Initialiser un dictionnaire pour stocker les vecteurs d'attaque
-    vecteur_attaque = {}
+    """
+    Prépare le vecteur d'attaque pour l'entrainement du classifieur d'attaque (Type d'attaque)
 
-    # Initialiser un ensemble pour stocker les caractéristiques uniques
+    Args:
+        traces (list): La liste des traces.
+
+    Returns:
+        dict: Le vecteur d'attaque.
+    """
+    vecteur_attaque = {}
     caracteristiques = set()
 
-    # Initialiser un index pour suivre l'index actuel dans le vecteur d'attaque
     index = 0
 
-    # Parcourir chaque trace dans les traces
     for trace in traces:
-        # Parcourir une plage de tailles de 2 à 5
         for taille in range(2, 6):
-            # Parcourir la trace actuelle avec la taille actuelle
             for i in range(0, len(trace) - taille):
-                # Créer un sous-ensemble de la trace
                 sous_ensemble = trace[i: i+taille]
 
-                # Créer une clé en joignant les éléments du sous-ensemble avec un tiret
                 pattern = "-".join(sous_ensemble)
 
-                # Si la clé est dans les caractéristiques et pas dans le vecteur d'attaque, ajouter la pattern au vecteur d'attaque
                 if pattern in caracteristiques:
                     if pattern not in vecteur_attaque:
                         vecteur_attaque[pattern] = index
                         index += 1
-                # Sinon, si la clé n'est pas dans les caractéristiques, ajouter la pattern aux caractéristiques
                 else:
                     caracteristiques.add(pattern)
 
-    # Retourner le vecteur d'attaque
     return vecteur_attaque
 
-# Detection d'une attaque ou non
 def train_binary(attack_data,train_data,validation_data):
+    """
+    Entraîne le classifieur binaire.
+
+    Args:
+        attack_data (pandas.DataFrame): Les données d'attaque.
+        train_data (pandas.DataFrame): Les données d'entrainement.
+        validation_data (pandas.DataFrame): Les données de validation.
+
+    Returns:
+        sklearn.linear_model.LogisticRegression: Le classifieur binaire.
+    """
 
     print('-' * 60)
     print("Entraînement du classifieur binaire en cours")
@@ -176,6 +248,9 @@ def train_binary(attack_data,train_data,validation_data):
     X_val, y_val = get_X_y(validation_data)
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+    
+    # testGridSearch(X_train, y_train)
+
     binary_classifier.fit(X_train, y_train)
 
     pred_val = binary_classifier.predict(X_val)
@@ -188,16 +263,25 @@ def train_binary(attack_data,train_data,validation_data):
     print('-' * 60)
 
 
-# Detection du type d'attaque
 
 def train_attack(attack_vector,attack_data):
+    """
+    Entraîne le classifieur d'attaque.
+
+    Args:
+        attack_vector (list): Le vecteur d'attaque.
+        attack_data (pandas.DataFrame): Les données d'attaque.
+
+    Returns:
+        sklearn.linear_model.LogisticRegression: Le classifieur d'attaque.
+    """
 
     print("\nEntraînement de la détection d'attaque en cours")
     traces = attack_data["trace"].apply(lambda x: x.split())
 
     X, y = get_X_y(attack_data,attack_vector)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-
+    # testGridSearch(X_train, y_train)
     y_train = y_train.argmax(axis=1)
     y_test = y_test.argmax(axis=1)
     
@@ -209,9 +293,20 @@ def train_attack(attack_vector,attack_data):
 
     print('-' * 60)
 
-# Prediction de la dection d'une attaque ou non et du type d'attaque
 
 def predict(trace, attack_vector, threshold=0.13):
+    """
+    Prédit si une attaque a été effectuée ou non et le type d'attaque.
+
+    Args:
+        trace (list): La trace à analyser.
+        attack_vector (list): Le vecteur d'attaque.
+        threshold (float, optional): Le seuil de prédiction. Defaults to 0.13.
+
+    Returns:
+        int: Le type d'attaque.
+    """
+
     if isinstance(trace, str):
         trace = np.array([list(map(int, trace.split()))])
         
@@ -230,7 +325,14 @@ def predict(trace, attack_vector, threshold=0.13):
 
 # Test de l'IA avec des attaques
 
-def testIAWithSomeAttack():
+def testIAWithSomeAttack(attack_vector):
+    """
+    Teste l'IA avec des attaques.
+
+    Args:
+        attack_vector (list): Le vecteur d'attaque.
+    """
+
     try:
         files = {}
         file_directory = "FireArmor IA/AI_With_ADFA/IA ADFA-LD/tests/"
@@ -249,20 +351,6 @@ def testIAWithSomeAttack():
         print(e)
         print()
     
-def getDataFromTetragon():
-    try:
-        print(f"Loading ...")
-        with open("FireArmor IA/AI_With_ADFA/IA ADFA-LD/tests/attack.txt") as fs:
-            trace = fs.read().strip()
-        print("Fichier envoyé à l'IA : ", "attack.txt")
-        pred = PREDICTIONS.get(predict(trace,attack_vector), "-")
-        print("VERDICT:", pred)
-        print('-' * 60)
-    except:
-        print("Error")
-        print()
-    return 0
-
 
 if __name__ == "__main__":
     
@@ -285,7 +373,7 @@ if __name__ == "__main__":
 
     print('-' * 60)
     print("Testing model")
-    testIAWithSomeAttack()
+    testIAWithSomeAttack(attack_vector)
     print("Testing complete")
     print('-' * 60)
 
