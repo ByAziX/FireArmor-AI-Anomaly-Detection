@@ -362,9 +362,9 @@ def predict_trace_from_file(train_vector, attack_vector):
 
 if __name__ == "__main__":
     
-    train_data_path = "FireArmor IA/AI_With_ADFA/ADFA-LD DataSet/DataSet/train.csv"
+    train_data_path = "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/train.csv"
     DataSetFolder = "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/"
-    validation_data_path = "FireArmor IA/AI_With_ADFA/ADFA-LD DataSet/DataSet/validation_data.csv"
+    validation_data_path = "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/validation_data.csv"
     train_data, validation_data, attack_data = load_data(train_data_path, validation_data_path)
 
     print('-' * 60)
