@@ -354,11 +354,11 @@ def testIAWithSomeAttack(attack_vector):
 
 if __name__ == "__main__":
     
-    train_data_path = "train.csv"
+    train_data_path = "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/train.csv"
     DataSetFolder = "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/"
 
     # train_data_path = "FireArmor IA/AI_With_ADFA/IA ADFA-LD/train_data.csv"
-    validation_data_path = "FireArmor IA/AI_With_ADFA/IA ADFA-LD/validation_data.csv"
+    validation_data_path = "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/validation_data.csv"
     train_data, validation_data, attack_data = load_data(train_data_path, validation_data_path)
 
     print('-' * 60)
@@ -366,9 +366,7 @@ if __name__ == "__main__":
     traces = attack_data["trace"].apply(lambda x: x.split())
     attack_vector = preparer_vecteur(traces)
     train_binary(attack_data,train_data,validation_data)
-    sauvegarder_modele(binary_classifier, DataSetFolder+"binary_classifier.pkl")
     train_attack(attack_vector,attack_data)
-    sauvegarder_modele(attack_classifier, DataSetFolder+"attack_classifier.pkl")
     print("Training complete")
 
     print('-' * 60)
