@@ -15,6 +15,12 @@ import pyautogui
 
 
 def get_my_ip():
+    """  Return the IP address of the current machine 
+
+    Returns:
+        str: The IP address of the current machine
+    """
+
     interfaces = netifaces.interfaces()
     for interface in interfaces:
         if interface != 'wlan0':
@@ -24,6 +30,11 @@ def get_my_ip():
                 return ipv4_address
 
 def execute_command(command):
+    """ Execute a command in the terminal
+
+    Args:
+        command (str): The command to execute
+    """
     process = subprocess.Popen(command, shell=True)
     process.wait()
 
@@ -39,6 +50,11 @@ def kill_process_by_port(port):
             pass
 
 def compare_and_delete_files(folder_path):
+    """ Compare all the files in a folder and delete the duplicates
+
+    Args:
+        folder_path (str): The path of the folder containing the files
+    """
     file_list = os.listdir(folder_path)
     num_files = len(file_list)
 
@@ -61,6 +77,8 @@ def compare_and_delete_files(folder_path):
 
 
 def get_syscall_from_ssh():
+    """ Get the syscall from the SSH attack
+    """
     wordList = '/usr/share/wordlists/rockyou.txt'
     ip_list = ['10.10.10.15','10.10.10.16', '10.10.10.13', '10.10.10.14','10.10.10.12']  # Liste d'adresses IP différentes
     name_list = ['root', 'admin', 'user']  # Liste de noms d'utilisateur différents
@@ -69,8 +87,7 @@ def get_syscall_from_ssh():
     for i in range(40):
         ip = random.choice(ip_list)  # Sélectionne une adresse IP aléatoire
         name = random.choice(name_list)  # Sélectionne un nom d'utilisateur aléatoire
-
-        output_file = 'output-{i}.txt'.format(i=i)  # Utilise un nom de fichier différent à chaque exécution
+        output_file = 'output.txt'
 
         cmd1 = "strace -e trace=all -o {output_file} hydra -l {name} -p {wordList} {ip} ssh".format(
             output_file=output_file, name=name, wordList=wordList, ip=ip)
@@ -88,6 +105,12 @@ def get_syscall_from_ssh():
         replace_syscall_with_number(syscall_names_file_base, 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Hydra_SSH_11/UAD-Hydra-SSH-1-{i}.txt'.format(i=i))
 
 def get_syscall_from_hydra_http(json_file):
+    """ Get the syscall from the Hydra HTTP attack
+
+    Args:
+        json_file (str): The path of the json file containing the data
+    """
+
     output_file = 'output.txt'
     syscall_names_file_base = 'syscall_names.txt'
 
@@ -110,6 +133,8 @@ def get_syscall_from_hydra_http(json_file):
 
 
 def get_syscall_from_Meterpreter():
+    """ Get the syscall from the Meterpreter attack
+    """
     syscall_names_file_base = 'syscall_names.txt'
     payload = "meterpreterPayload"
     csv_file = 'FireArmor IA/AI_With_ADFA/ADFA-LD/label.csv'
@@ -149,6 +174,11 @@ def get_syscall_from_Meterpreter():
 
 
 def get_systemcall_from_your_computer(json_file):
+    """ Get the syscall from your computer
+
+    Args:
+        json_file (str): The path of the json file containing the data
+    """
     syscall_regex = r'#define __NR(?:3264_)?(\w+)\s+(\d+)'
 
     syscalls = {}
@@ -166,6 +196,12 @@ def get_systemcall_from_your_computer(json_file):
         json.dump(syscalls, f, indent=4)
 
 def replace_syscall_with_number(input_file, output_file):
+    """ Replace the syscall name with the syscall number
+
+    Args:
+        input_file (str): The path of the file containing the syscall names
+        output_file (str): The path of the file containing the syscall numbers
+    """
     json_file = 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/syscalls.json'
     
     # load syscall numbers from JSON
@@ -188,9 +224,9 @@ def replace_syscall_with_number(input_file, output_file):
 if __name__ == "__main__":
     json_file = 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/syscalls.json'
     ssh_file = 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Hydra_SSH_11/'
-    # get_syscall_from_ssh()
-    # get_syscall_from_Meterpreter()
     get_systemcall_from_your_computer(json_file)
+    get_syscall_from_ssh()
+    # get_syscall_from_Meterpreter()
     # get_syscall_from_hydra_http()
     # get_syscall_from_Meterpreter()
     compare_and_delete_files(ssh_file)
