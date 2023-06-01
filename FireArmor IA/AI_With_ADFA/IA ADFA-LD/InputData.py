@@ -98,6 +98,6 @@ if __name__ == "__main__":
     for sub_dir in sub_dir_attack:
         attack_files.extend(readfilesfromAdir(sub_dir))
 
-    create_file("train.csv", train_files, attack_files, sub_dir_attack)
+    create_file("FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/train.csv", train_files, attack_files, sub_dir_attack)
 
     tableauDataSet(countLabel,train_files,attack_files)

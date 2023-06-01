@@ -32,16 +32,40 @@ MODEL_CLASS_PATH = "model_class.h5"
 DIRECTORY = "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/"
 
 def save_model(model, model_name):
-    """ Save the trained model """
+    """
+    Save the trained model
+
+    Args:
+        model: The trained model
+        model_name: The name of the model file
+
+    Returns:
+        None
+    """
     model.save(model_name)
 
 def load_model(model_name):
-    """ Load the trained model """
+    """ Load the trained model 
+    Args:
+        model_name: The name of the model file
+
+    Returns:
+        The trained model
+    """
     model = tf.keras.models.load_model(model_name)
     return model
 
 def preprocess_data(file_path):
-    """ Preprocess the trace data """
+    """ Preprocess the trace data 
+    Args:
+        file_path: The path to the trace data file
+
+    Returns:
+        X_train: The training data
+        X_test: The test data
+        y_train: The training labels
+        y_test: The test labels
+    """
     data = pd.read_csv(file_path)
 
     # Preprocess trace sequences
@@ -66,7 +90,13 @@ def preprocess_data(file_path):
     return X_train, X_test, y_train, y_test
 
 def build_model_prob(input_shape):
-    """ Build the LSTM model for anomaly detection """
+    """ Build the LSTM model for anomaly detection 
+    Args:
+        input_shape: The shape of the input data
+
+    Returns:
+        The LSTM model
+    """
     model = Sequential()
     model.add(LSTM(100, input_shape=input_shape, return_sequences=True))
     model.add(LSTM(100))
@@ -75,7 +105,14 @@ def build_model_prob(input_shape):
     return model
 
 def build_model_class(input_shape, num_classes):
-    """ Build the LSTM model for attack classification """
+    """ Build the LSTM model for attack classification 
+    Args:
+        input_shape: The shape of the input data
+        num_classes: The number of classes
+
+    Returns:
+        The LSTM model
+    """
     model = Sequential()
     model.add(LSTM(100, input_shape=input_shape, return_sequences=True))
     model.add(LSTM(100))
@@ -84,17 +121,51 @@ def build_model_class(input_shape, num_classes):
     return model
 
 def train_model_prob(model, X_train, y_train, X_test, y_test, epochs=EPOCHS, batch_size=BATCH_SIZE):
-    """ Train the LSTM model for anomaly detection """
+    """ Train the LSTM model for anomaly detection 
+    Args:
+        model: The LSTM model
+        X_train: The training data
+        y_train: The training labels
+        X_test: The test data
+        y_test: The test labels
+        epochs: The number of epochs
+        batch_size: The batch size
+
+    Returns:
+        The trained LSTM model
+    """
     model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, validation_data=(X_test, y_test))
     return model
 
 def train_model_class(model, X_train, y_train, X_test, y_test, epochs=EPOCHS, batch_size=BATCH_SIZE):
-    """ Train the LSTM model for attack classification """
+    """ Train the LSTM model for attack classification 
+    Args:
+        model: The LSTM model
+        X_train: The training data
+        y_train: The training labels
+        X_test: The test data
+        y_test: The test labels
+        epochs: The number of epochs
+        batch_size: The batch size
+
+    Returns:
+        The trained LSTM model
+    """
     model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, validation_data=(X_test, y_test))
     return model
 
 def predict_trace(model_prob, model_class, trace):
-    """ Predict if a trace is normal or anomalous, and classify the attack type """
+    """ Predict if a trace is normal or anomalous, and classify the attack type 
+    Args:
+        model_prob: The LSTM model for anomaly detection
+        model_class: The LSTM model for attack classification
+        trace: The trace to predict
+
+    Returns:
+        predicted_class_label: The predicted class label
+        attack_type_label: The attack type label
+        anomaly_prediction: The anomaly prediction
+    """
     # Pad the sequence to match the expected length
     trace = pad_sequences([trace], maxlen=SEQUENCE_LENGTH)
 
@@ -118,7 +189,7 @@ def predict_trace(model_prob, model_class, trace):
     return predicted_class_label, attack_type_label, anomaly_prediction
 
 def main():
-    # Check if the model files exist
+    """ The main function """
     if os.path.exists(os.path.join(DIRECTORY, MODEL_PROB_PATH)) and os.path.exists(os.path.join(DIRECTORY, MODEL_CLASS_PATH)):
         # Load the models
         model_prob = load_model(os.path.join(DIRECTORY, MODEL_PROB_PATH))
