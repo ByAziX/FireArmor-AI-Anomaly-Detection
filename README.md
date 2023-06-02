@@ -7,29 +7,26 @@
 
 
 ## Introduction
-Le dataset ADFA-LD (Advanced Data Mining and Its Applications Lab Dataset) est un ensemble de données qui contient des informations sur les appels système Linux. Il a été conçu pour la recherche sur la détection d'anomalies et est souvent utilisé pour tester des modèles d'apprentissage automatique.
+The ADFA-LD (Advanced Data Mining and Its Applications Lab Dataset) is a dataset containing information on Linux system calls. It has been designed for anomaly detection research and is often used to test machine learning models.
 
-Dans ce tutoriel, nous utiliserons l'algorithme de forêt aléatoire (Random Forest) pour créer un modèle qui détecte les anomalies dans les systèmes d'appels.
+In this tutorial, we'll use the Random Forest algorithm to create a model that detects anomalies in system calls.
 
-## Étapes
+## Steps
 
-<<<<<<< dev
-### 1. Importation des bibliothèques et des modules
-Installer les bibliothèques requises (numpy, pandas, scikit-learn, matplotlib, seaborn) avant d'exécuter le code.
-### 2. Préparation des données du DataSet ADFA-LD
+### 1. Importing libraries and modules
 
-Avant de commencer, assurez-vous d'avoir téléchargé le dataset ADFA-LD. Les fichiers nécessaires pour ce modèle sont train.csv et validation_data.csv. Placez ces fichiers dans le répertoire approprié.
+Install the required libraries (numpy, pandas, scikit-learn, matplotlib, seaborn) before running the code.
+### 2. Preparing ADFA-LD DataSet data
 
-Si vous ne disposez pas du fichier train.csv, vous pouvez le créer à l'aide du script InputData.py. Ce script est responsable de la création du fichier train.csv à partir des fichiers de traces brutes. Assurez-vous d'avoir les fichiers de traces brutes nécessaires et exécutez le script pour générer le fichier train.csv.
+To launch the python scripts, go to the github repository source, as the paths are in relative path.
 
-Le fichier train.csv contient les données d'entraînement nécessaires pour former le modèle de détection d'anomalies. Une fois que vous avez créé le fichier train.csv, vous pouvez le placer dans le répertoire approprié et exécuter le reste du code pour créer et évaluer le modèle.
+Before you start, make sure you've downloaded the ADFA-LD dataset. The files required for this model are train.csv and validation_data.csv. Place these files in the appropriate directory.
 
-### 3. Exécution du code
+If you don't have the train.csv file, you can create it using the `InputData.py` script. This script is responsible for creating the `train.csv` file from the raw trace files. Make sure you have the necessary raw trace files and run the script to generate the train.csv file.
 
-Vous pouvez exécuter le code Python pour créer et évaluer le modèle de détection d'anomalies basé sur l'algorithme de forêt aléatoire. Assurez-vous d'avoir configuré correctement l'environnement Python et d'avoir les fichiers de données requis dans le répertoire approprié.
+The train.csv file contains the training data required to form the anomaly detection model. Once you've created the train.csv file, you can place it in the appropriate directory and run the rest of the code to create and evaluate the model.
+### 3. Code execution
 
-Veuillez consulter les commentaires dans le code pour obtenir des informations détaillées sur chaque étape et fonction.
-=======
-### 1. Préparation des données du DataSet ADFA-LD
+You can run the Python code `RandomForestClassifierWithPattern` to create and evaluate the anomaly detection model based on the random forest algorithm. Make sure you have correctly configured the Python environment and have the required data files in the appropriate directory.
 
->>>>>>> main
+Please refer to the comments in the code for detailed information on each step and function.
