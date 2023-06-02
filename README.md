@@ -13,6 +13,7 @@ Dans ce tutoriel, nous utiliserons l'algorithme de forêt aléatoire (Random For
 
 ## Étapes
 
+<<<<<<< dev
 ### 1. Importation des bibliothèques et des modules
 Installer les bibliothèques requises (numpy, pandas, scikit-learn, matplotlib, seaborn) avant d'exécuter le code.
 ### 2. Préparation des données du DataSet ADFA-LD
@@ -28,3 +29,7 @@ Le fichier train.csv contient les données d'entraînement nécessaires pour for
 Vous pouvez exécuter le code Python pour créer et évaluer le modèle de détection d'anomalies basé sur l'algorithme de forêt aléatoire. Assurez-vous d'avoir configuré correctement l'environnement Python et d'avoir les fichiers de données requis dans le répertoire approprié.
 
 Veuillez consulter les commentaires dans le code pour obtenir des informations détaillées sur chaque étape et fonction.
+=======
+### 1. Préparation des données du DataSet ADFA-LD
+
+>>>>>>> main
