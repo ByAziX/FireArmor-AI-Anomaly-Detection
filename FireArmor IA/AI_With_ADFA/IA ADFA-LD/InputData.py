@@ -4,12 +4,20 @@ import numpy as np
 
 
 def readfilesfromAdir(dataset):
+    """ read all the files from a directory
+
+    Args:
+        dataset (str): The path of the directory containing the files
+
+    Returns:
+        list: The list of the files in the directory
+    """
+
     files = os.listdir(dataset)
     files_absolute_paths = []
     for i in files:
         files_absolute_paths.append(dataset+str(i))
     return files_absolute_paths
-
 
 #this is used to read a char sequence from
 def readCharsFromFile(file):
@@ -26,6 +34,15 @@ def get_attack_subdir(path):
 
 
 def create_file(file, dataTrain, dataAttack, sub_dir_attack):
+    """ Create a file containing the data of the dataset
+
+    Args:
+        file (str): The path of the file to create
+        dataTrain (list): The list of the files in the training dataset
+        dataAttack (list): The list of the files in the attack dataset
+        sub_dir_attack (list): The list of the subdirectories in the attack dataset
+    """
+
     with open(file, 'w') as f:
         label = ['trace', 'Adduser', 'Hydra_FTP', 'Hydra_SSH', 'Java_Meterpreter', 'Meterpreter', 'Web_Shell']
         index = []
@@ -66,6 +83,14 @@ def create_file(file, dataTrain, dataAttack, sub_dir_attack):
 
 
 def tableauDataSet(countLabel,dataTrain,dataAttack):
+    """ Create a table containing the number of files for each label
+
+    Args:
+        countLabel (list): The list of the number of files for each label
+        dataTrain (list): The list of the files in the training dataset
+        dataAttack (list): The list of the files in the attack dataset
+    """
+
     label = ['Adduser', 'Hydra_FTP', 'Hydra_SSH', 'Java_Meterpreter', 'Meterpreter', 'Web_Shell']
     print('-' * 60)
     print('{:<30s}{:<15s}'.format('Label', 'Count'))
