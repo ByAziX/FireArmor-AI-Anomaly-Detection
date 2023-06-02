@@ -29,7 +29,7 @@ BATCH_SIZE = 32
 
 MODEL_PROB_PATH = "model_prob.h5"
 MODEL_CLASS_PATH = "model_class.h5"
-DIRECTORY = "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/"
+DIRECTORY = "FireArmor-AI-Anomaly-Detection/FireArmor IA/ADFA-LD/DataSet/"
 
 def save_model(model, model_name):
     """
@@ -220,7 +220,7 @@ def main():
         save_model(model_class, os.path.join(DIRECTORY, MODEL_CLASS_PATH))
 
     # Predict a trace
-    trace = InputData.readCharsFromFile("FireArmor IA/AI_With_ADFA/IA ADFA-LD/tests/UAD-Hydra-SSH-1-2311.txt")
+    trace = InputData.readCharsFromFile("FireArmor-AI-Anomaly-Detection/FireArmor IA/IA ADFA-LD/tests/UAD-Hydra-SSH-1-2311.txt")
 
     predicted_class_label, attack_type_label, anomaly_prediction = predict_trace(model_prob, model_class, trace)
 

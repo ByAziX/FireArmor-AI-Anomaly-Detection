@@ -110,10 +110,9 @@ def tableauDataSet(countLabel,dataTrain,dataAttack):
 
 
 if __name__ == "__main__":
-    directory_train = "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Training_Data_Master/"
-    directory_validation = "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Validation_Data_Master/"
-    directory_attack = "FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/"
-
+    directory_train = "FireArmor-AI-Anomaly-Detection/FireArmor IA/ADFA-LD/DataSet/Training_Data_Master/"
+    directory_validation = "FireArmor-AI-Anomaly-Detection/FireArmor IA/ADFA-LD/DataSet/Validation_Data_Master/"
+    directory_attack = "FireArmor-AI-Anomaly-Detection/FireArmor IA/ADFA-LD/DataSet/Attack_Data_Master/"
     train_files = readfilesfromAdir(directory_train)
     sub_dir_attack = get_attack_subdir(directory_attack)
     print("train.csv is created")
@@ -123,6 +122,6 @@ if __name__ == "__main__":
     for sub_dir in sub_dir_attack:
         attack_files.extend(readfilesfromAdir(sub_dir))
 
-    create_file("FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/train.csv", train_files, attack_files, sub_dir_attack)
+    create_file("FireArmor-AI-Anomaly-Detection/FireArmor IA/ADFA-LD/DataSet/train.csv", train_files, attack_files, sub_dir_attack)
 
     tableauDataSet(countLabel,train_files,attack_files)

